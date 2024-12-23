@@ -1,0 +1,33 @@
+{
+  "name": "bpsets",
+  "version": "0.1.0",
+  "main": "build/main.js",
+  "scripts": {
+    "build": "./build.sh",
+    "start": "./build.sh && ./dist/bpsets"
+  },
+  "author": "Minhyeok Park<pmh_only@pmh.codes>",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-apigatewayv2": "^3.716.0",
+    "@aws-sdk/client-auto-scaling": "^3.716.0",
+    "@aws-sdk/client-backup": "^3.716.0",
+    "@aws-sdk/client-cloudfront": "^3.716.0",
+    "@aws-sdk/client-elastic-load-balancing-v2": "^3.716.0",
+    "@aws-sdk/client-lambda": "^3.716.0",
+    "@aws-sdk/client-s3": "^3.717.0",
+    "@aws-sdk/client-s3-control": "^3.716.0",
+    "@aws-sdk/client-sts": "^3.716.0",
+    "@aws-sdk/client-wafv2": "^3.716.0",
+    "@smithy/smithy-client": "^3.5.1",
+    "express": "^4.21.2",
+    "sha.js": "^2.4.11"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@types/sha.js": "^2.4.4",
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.2"
+  }
+}
