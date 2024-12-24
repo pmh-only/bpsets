@@ -24,122 +24,6 @@
     "adviseBeforeFixFunction": "Ensure that enabling this attribute does not break any custom client behavior."
   },
   {
-    "name": "ALBWafEnabled",
-    "description": "Verifies if a WAF is associated with the ALB.",
-    "priority": 2,
-    "priorityReason": "WAF protects the application from known vulnerabilities and attacks.",
-    "awsService": "ELBv2",
-    "awsServiceCategory": "Application Load Balancer",
-    "bestPracticeCategory": "Security",
-    "requiredParametersForFix": [
-      {
-        "name": "webAclArn",
-        "description": "The ARN of the WAF WebACL to associate with the ALB.",
-        "default": "",
-        "example": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/ExampleWebACL/12345678-1234-5678-abcd-1234567890ab"
-      }
-    ],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "GetWebACLForResource",
-        "reason": "Check if a WAF is associated with the ALB."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "AssociateWebACL",
-        "reason": "Associate a WAF WebACL with the ALB."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure the WAF WebACL is configured and ready for use to prevent blocking legitimate traffic."
-  },
-  {
-    "name": "ALBCrossZoneLoadBalancingEnabled",
-    "description": "Ensures cross-zone load balancing is enabled for the ALB.",
-    "priority": 3,
-    "priorityReason": "Cross-zone load balancing ensures even traffic distribution across instances in multiple zones.",
-    "awsService": "ELBv2",
-    "awsServiceCategory": "Application Load Balancer",
-    "bestPracticeCategory": "Performance",
-    "requiredParametersForFix": [],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeLoadBalancerAttributes",
-        "reason": "Retrieve ALB attributes to check for cross-zone load balancing configuration."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "ModifyLoadBalancerAttributes",
-        "reason": "Enable cross-zone load balancing for the ALB."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure that enabling this attribute aligns with your traffic distribution strategy."
-  },
-  {
-    "name": "ALBDeletionProtectionEnabled",
-    "description": "Ensures deletion protection is enabled for the ALB.",
-    "priority": 1,
-    "priorityReason": "Deletion protection prevents accidental or unauthorized deletion of the ALB.",
-    "awsService": "ELBv2",
-    "awsServiceCategory": "Application Load Balancer",
-    "bestPracticeCategory": "Resilience",
-    "requiredParametersForFix": [],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeLoadBalancerAttributes",
-        "reason": "Retrieve ALB attributes to check for deletion protection configuration."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "ModifyLoadBalancerAttributes",
-        "reason": "Enable deletion protection for the ALB."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure that deletion protection aligns with your operational requirements."
-  },
-  {
-    "name": "ALBLoggingEnabled",
-    "description": "Ensures access logging is enabled for the ALB.",
-    "priority": 2,
-    "priorityReason": "Access logs help in monitoring and debugging traffic issues.",
-    "awsService": "ELBv2",
-    "awsServiceCategory": "Application Load Balancer",
-    "bestPracticeCategory": "Monitoring",
-    "requiredParametersForFix": [
-      {
-        "name": "s3BucketName",
-        "description": "The name of the S3 bucket to store access logs.",
-        "default": "",
-        "example": "my-logs-bucket"
-      },
-      {
-        "name": "s3BucketPrefix",
-        "description": "The prefix for the access logs in the S3 bucket.",
-        "default": "",
-        "example": "ALB/logs/"
-      }
-    ],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeLoadBalancerAttributes",
-        "reason": "Retrieve ALB attributes to check for logging configuration."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "ModifyLoadBalancerAttributes",
-        "reason": "Enable logging and configure the S3 bucket and prefix for the ALB."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure that the specified S3 bucket is correctly configured to receive access logs."
-  },
-  {
     "name": "APIGatewayV2AccessLogsEnabled",
     "description": "Ensures that access logs are enabled for API Gateway V2 HTTP APIs.",
     "priority": 2,
@@ -231,30 +115,6 @@
       }
     ],
     "adviseBeforeFixFunction": "Ensure the WAF WebACL is properly configured before associating it with the API Gateway stage."
-  },
-  {
-    "name": "APIGatewayCacheEnabledAndEncrypted",
-    "description": "Ensures that caching is enabled and encrypted for API Gateway stages.",
-    "priority": 3,
-    "priorityReason": "Encrypted caching protects sensitive data and improves performance.",
-    "awsService": "APIGateway",
-    "awsServiceCategory": "REST API",
-    "bestPracticeCategory": "Performance",
-    "requiredParametersForFix": [],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "GetStageCommand",
-        "reason": "Retrieve stage information to check caching and encryption settings."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "UpdateStageCommand",
-        "reason": "Enable caching and encryption for the API Gateway stage."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure that enabling caching aligns with your performance requirements."
   },
   {
     "name": "APIGatewayExecutionLoggingEnabled",
@@ -371,7 +231,8 @@
       }
     ],
     "adviseBeforeFixFunction": "Ensure the launch template is properly configured before associating it with the Auto Scaling Group."
-  },  {
+  },
+  {
     "name": "CloudFrontAccessLogsEnabled",
     "description": "Ensures that access logging is enabled for CloudFront distributions.",
     "priority": 2,
@@ -517,36 +378,6 @@
       }
     ],
     "adviseBeforeFixFunction": "Ensure all origins are configured to accept HTTPS traffic."
-  },{
-    "name": "CloudWatchLogGroupRetentionPeriodCheck",
-    "description": "Ensures that CloudWatch log groups have a retention period set.",
-    "priority": 2,
-    "priorityReason": "Setting a retention period ensures that logs do not accumulate indefinitely, which helps manage storage costs.",
-    "awsService": "CloudWatch",
-    "awsServiceCategory": "Log Groups",
-    "bestPracticeCategory": "Cost Management",
-    "requiredParametersForFix": [
-      {
-        "name": "retentionInDays",
-        "description": "The retention period in days for the log group.",
-        "default": "30",
-        "example": "7"
-      }
-    ],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeLogGroupsCommand",
-        "reason": "Retrieve information about CloudWatch log groups to check their retention period."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "PutRetentionPolicyCommand",
-        "reason": "Set the retention period for the CloudWatch log group."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure the chosen retention period meets compliance and data retention policies."
   },
   {
     "name": "CloudWatchAlarmSettingsCheck",
@@ -800,274 +631,139 @@
     ],
     "adviseBeforeFixFunction": "Ensure the specified KMS key is accessible and properly configured."
   },
-    {
-      "name": "EC2EBSVolumeEncryptionEnabled",
-      "description": "Ensures that all EBS volumes are encrypted.",
-      "priority": 1,
-      "priorityReason": "Encryption protects sensitive data at rest.",
-      "awsService": "EC2",
-      "awsServiceCategory": "Elastic Block Store (EBS)",
-      "bestPracticeCategory": "Security",
-      "requiredParametersForFix": [
-        {
-          "name": "kmsKeyId",
-          "description": "The KMS key ID to use for encryption.",
-          "default": "",
-          "example": "arn:aws:kms:us-east-1:123456789012:key/abcdef12-3456-7890-abcd-ef1234567890"
-        }
-      ],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeVolumesCommand",
-          "reason": "Retrieve information about EBS volumes to check encryption status."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "ModifyVolumeCommand",
-          "reason": "Enable encryption for the EBS volume using the specified KMS key."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure the KMS key is accessible and properly configured for encryption."
-    },
-    {
-      "name": "EC2IMDSv2Required",
-      "description": "Ensures that all EC2 instances require IMDSv2 for enhanced security.",
-      "priority": 1,
-      "priorityReason": "IMDSv2 mitigates vulnerabilities related to metadata exploitation.",
-      "awsService": "EC2",
-      "awsServiceCategory": "Instances",
-      "bestPracticeCategory": "Security",
-      "requiredParametersForFix": [],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeInstancesCommand",
-          "reason": "Retrieve metadata settings of EC2 instances to check IMDS version enforcement."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "ModifyInstanceMetadataOptionsCommand",
-          "reason": "Enforce IMDSv2 on the EC2 instance."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure that enforcing IMDSv2 will not disrupt any existing services relying on metadata."
-    },
-    {
-      "name": "EC2DetailedMonitoringEnabled",
-      "description": "Ensures that detailed monitoring is enabled for all EC2 instances.",
-      "priority": 2,
-      "priorityReason": "Detailed monitoring provides granular metrics for better operational visibility.",
-      "awsService": "EC2",
-      "awsServiceCategory": "Instances",
-      "bestPracticeCategory": "Monitoring",
-      "requiredParametersForFix": [],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeInstancesCommand",
-          "reason": "Retrieve monitoring settings for EC2 instances."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "MonitorInstancesCommand",
-          "reason": "Enable detailed monitoring for the EC2 instance."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure enabling detailed monitoring aligns with cost considerations."
-    },
-    {
-      "name": "EC2InstanceProfileAttached",
-      "description": "Ensures that all EC2 instances have an IAM instance profile attached.",
-      "priority": 2,
-      "priorityReason": "IAM instance profiles enable secure access to AWS services from EC2 instances.",
-      "awsService": "EC2",
-      "awsServiceCategory": "Instances",
-      "bestPracticeCategory": "Security",
-      "requiredParametersForFix": [
-        {
-          "name": "instanceProfileName",
-          "description": "The name of the IAM instance profile to attach.",
-          "default": "",
-          "example": "EC2InstanceProfile"
-        }
-      ],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeInstancesCommand",
-          "reason": "Check if IAM instance profiles are attached to EC2 instances."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "AssociateIamInstanceProfileCommand",
-          "reason": "Attach an IAM instance profile to the EC2 instance."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure the IAM instance profile has the required policies attached."
-    },
-    {
-      "name": "EC2StoppedInstance",
-      "description": "Ensures that unused stopped EC2 instances are terminated.",
-      "priority": 1,
-      "priorityReason": "Terminating stopped instances reduces costs and frees up resources.",
-      "awsService": "EC2",
-      "awsServiceCategory": "Instances",
-      "bestPracticeCategory": "Cost Management",
-      "requiredParametersForFix": [],
-      "isFixFunctionUsesDestructiveCommand": true,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeInstancesCommand",
-          "reason": "Identify stopped EC2 instances."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "TerminateInstancesCommand",
-          "reason": "Terminate unused stopped EC2 instances."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure that the stopped instances are no longer needed before terminating them."
-    },
-    {
-      "name": "ECRPrivateImageScanningEnabled",
-      "description": "Ensures that image scanning on push is enabled for ECR repositories.",
-      "priority": 1,
-      "priorityReason": "Enabling image scanning on push helps identify vulnerabilities in container images.",
-      "awsService": "ECR",
-      "awsServiceCategory": "Container Registry",
-      "bestPracticeCategory": "Security",
-      "requiredParametersForFix": [],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeRepositoriesCommand",
-          "reason": "Retrieve repository configurations to check if image scanning on push is enabled."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "PutImageScanningConfigurationCommand",
-          "reason": "Enable image scanning on push for the repository."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure the repository content complies with scanning requirements."
-    },
-    {
-      "name": "ECRPrivateLifecyclePolicyConfigured",
-      "description": "Ensures that lifecycle policies are configured for ECR repositories.",
-      "priority": 2,
-      "priorityReason": "Lifecycle policies help manage repository storage by automatically removing unneeded images.",
-      "awsService": "ECR",
-      "awsServiceCategory": "Container Registry",
-      "bestPracticeCategory": "Cost Management",
-      "requiredParametersForFix": [
-        {
-          "name": "lifecyclePolicyText",
-          "description": "The JSON-formatted lifecycle policy text.",
-          "default": "",
-          "example": "{\"rules\": [{\"rulePriority\": 1, \"description\": \"Keep only recent images\", \"selection\": {\"tagStatus\": \"untagged\", \"countType\": \"imageCountMoreThan\", \"countNumber\": 10, \"tagPrefixList\": []}, \"action\": {\"type\": \"expire\"}}]}"
-        }
-      ],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "GetLifecyclePolicyCommand",
-          "reason": "Check if a lifecycle policy is configured for the repository."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "PutLifecyclePolicyCommand",
-          "reason": "Configure a lifecycle policy for the repository."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure the lifecycle policy aligns with retention requirements."
-    },
-    {
-      "name": "ECRPrivateTagImmutabilityEnabled",
-      "description": "Ensures that tag immutability is enabled for ECR repositories.",
-      "priority": 2,
-      "priorityReason": "Tag immutability prevents overwriting tags, ensuring image stability and integrity.",
-      "awsService": "ECR",
-      "awsServiceCategory": "Container Registry",
-      "bestPracticeCategory": "Configuration",
-      "requiredParametersForFix": [],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeRepositoriesCommand",
-          "reason": "Retrieve repository configurations to check if tag immutability is enabled."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "PutImageTagMutabilityCommand",
-          "reason": "Enable tag immutability for the repository."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure that enabling tag immutability does not disrupt existing workflows."
-    },
-    {
-      "name": "ECRKmsEncryption",
-      "description": "Ensures that ECR repositories are encrypted using KMS keys.",
-      "priority": 1,
-      "priorityReason": "KMS encryption secures sensitive container images at rest.",
-      "awsService": "ECR",
-      "awsServiceCategory": "Container Registry",
-      "bestPracticeCategory": "Security",
-      "requiredParametersForFix": [
-        {
-          "name": "kmsKeyId",
-          "description": "The ID of the KMS key to use for encryption.",
-          "default": "",
-          "example": "arn:aws:kms:us-east-1:123456789012:key/abcdef12-3456-7890-abcd-ef1234567890"
-        }
-      ],
-      "isFixFunctionUsesDestructiveCommand": false,
-      "commandUsedInCheckFunction": [
-        {
-          "name": "DescribeRepositoriesCommand",
-          "reason": "Retrieve repository configurations to check encryption settings."
-        }
-      ],
-      "commandUsedInFixFunction": [
-        {
-          "name": "PutRepositoryPolicyCommand",
-          "reason": "Enable encryption for the repository using the specified KMS key."
-        }
-      ],
-      "adviseBeforeFixFunction": "Ensure the KMS key is properly configured and accessible."
-    },
-    
   {
-    "name": "ECSAwsvpcNetworkingEnabled",
-    "description": "Ensures that ECS task definitions use the `awsvpc` networking mode.",
+    "name": "EC2InstanceProfileAttached",
+    "description": "Ensures that all EC2 instances have an IAM instance profile attached.",
     "priority": 2,
-    "priorityReason": "Using the `awsvpc` networking mode provides each task with its own elastic network interface, improving network isolation.",
-    "awsService": "ECS",
-    "awsServiceCategory": "Task Definitions",
+    "priorityReason": "IAM instance profiles enable secure access to AWS services from EC2 instances.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "instanceProfileName",
+        "description": "The name of the IAM instance profile to attach.",
+        "default": "",
+        "example": "EC2InstanceProfile"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeInstancesCommand",
+        "reason": "Check if IAM instance profiles are attached to EC2 instances."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "AssociateIamInstanceProfileCommand",
+        "reason": "Attach an IAM instance profile to the EC2 instance."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the IAM instance profile has the required policies attached."
+  },
+  {
+    "name": "EC2StoppedInstance",
+    "description": "Ensures that unused stopped EC2 instances are terminated.",
+    "priority": 1,
+    "priorityReason": "Terminating stopped instances reduces costs and frees up resources.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Cost Management",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": true,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeInstancesCommand",
+        "reason": "Identify stopped EC2 instances."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "TerminateInstancesCommand",
+        "reason": "Terminate unused stopped EC2 instances."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the stopped instances are no longer needed before terminating them."
+  },
+  {
+    "name": "ECRPrivateImageScanningEnabled",
+    "description": "Ensures that image scanning on push is enabled for ECR repositories.",
+    "priority": 1,
+    "priorityReason": "Enabling image scanning on push helps identify vulnerabilities in container images.",
+    "awsService": "ECR",
+    "awsServiceCategory": "Container Registry",
     "bestPracticeCategory": "Security",
     "requiredParametersForFix": [],
     "isFixFunctionUsesDestructiveCommand": false,
     "commandUsedInCheckFunction": [
       {
-        "name": "DescribeTaskDefinitionCommand",
-        "reason": "Retrieve task definition details to check the networking mode."
+        "name": "DescribeRepositoriesCommand",
+        "reason": "Retrieve repository configurations to check if image scanning on push is enabled."
       }
     ],
     "commandUsedInFixFunction": [
       {
-        "name": "RegisterTaskDefinitionCommand",
-        "reason": "Update the task definition to use the `awsvpc` networking mode."
+        "name": "PutImageScanningConfigurationCommand",
+        "reason": "Enable image scanning on push for the repository."
       }
     ],
-    "adviseBeforeFixFunction": "Ensure the ECS cluster and tasks are configured to support `awsvpc` networking mode."
+    "adviseBeforeFixFunction": "Ensure the repository content complies with scanning requirements."
+  },
+  {
+    "name": "ECRPrivateLifecyclePolicyConfigured",
+    "description": "Ensures that lifecycle policies are configured for ECR repositories.",
+    "priority": 2,
+    "priorityReason": "Lifecycle policies help manage repository storage by automatically removing unneeded images.",
+    "awsService": "ECR",
+    "awsServiceCategory": "Container Registry",
+    "bestPracticeCategory": "Cost Management",
+    "requiredParametersForFix": [
+      {
+        "name": "lifecyclePolicyText",
+        "description": "The JSON-formatted lifecycle policy text.",
+        "default": "",
+        "example": "{\"rules\": [{\"rulePriority\": 1, \"description\": \"Keep only recent images\", \"selection\": {\"tagStatus\": \"untagged\", \"countType\": \"imageCountMoreThan\", \"countNumber\": 10, \"tagPrefixList\": []}, \"action\": {\"type\": \"expire\"}}]}"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetLifecyclePolicyCommand",
+        "reason": "Check if a lifecycle policy is configured for the repository."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutLifecyclePolicyCommand",
+        "reason": "Configure a lifecycle policy for the repository."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the lifecycle policy aligns with retention requirements."
+  },
+  {
+    "name": "ECRPrivateTagImmutabilityEnabled",
+    "description": "Ensures that tag immutability is enabled for ECR repositories.",
+    "priority": 2,
+    "priorityReason": "Tag immutability prevents overwriting tags, ensuring image stability and integrity.",
+    "awsService": "ECR",
+    "awsServiceCategory": "Container Registry",
+    "bestPracticeCategory": "Configuration",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeRepositoriesCommand",
+        "reason": "Retrieve repository configurations to check if tag immutability is enabled."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutImageTagMutabilityCommand",
+        "reason": "Enable tag immutability for the repository."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that enabling tag immutability does not disrupt existing workflows."
   },
   {
     "name": "ECSContainersNonPrivileged",
@@ -1092,30 +788,6 @@
       }
     ],
     "adviseBeforeFixFunction": "Ensure the containers do not require privileged mode for their operations."
-  },
-  {
-    "name": "ECSContainersReadOnlyAccess",
-    "description": "Ensures that ECS containers have a read-only root filesystem where applicable.",
-    "priority": 1,
-    "priorityReason": "A read-only root filesystem limits the ability of attackers to modify the system and improves security.",
-    "awsService": "ECS",
-    "awsServiceCategory": "Task Definitions",
-    "bestPracticeCategory": "Security",
-    "requiredParametersForFix": [],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeTaskDefinitionCommand",
-        "reason": "Retrieve task definition details to check root filesystem settings."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "RegisterTaskDefinitionCommand",
-        "reason": "Update the task definition to enable a read-only root filesystem."
-      }
-    ],
-    "adviseBeforeFixFunction": "Verify that containers can operate with a read-only root filesystem."
   },
   {
     "name": "ECSContainerInsightsEnabled",
@@ -1504,78 +1176,6 @@
       }
     ],
     "adviseBeforeFixFunction": "Verify the snapshot retention policy aligns with organizational recovery requirements."
-  },
-  {
-    "name": "ElastiCacheReplicationGroupAutoFailoverEnabled",
-    "description": "Ensures that Auto Failover is enabled for ElastiCache replication groups.",
-    "priority": 1,
-    "priorityReason": "Auto Failover ensures high availability and reduces downtime during node failures.",
-    "awsService": "ElastiCache",
-    "awsServiceCategory": "Replication Groups",
-    "bestPracticeCategory": "Resilience",
-    "requiredParametersForFix": [],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeReplicationGroupsCommand",
-        "reason": "Retrieve replication group configurations to check Auto Failover settings."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "ModifyReplicationGroupCommand",
-        "reason": "Enable Auto Failover for the replication group."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure enabling Auto Failover aligns with application high availability requirements."
-  },
-  {
-    "name": "ElastiCacheReplicationGroupEncryptedAtRest",
-    "description": "Ensures that ElastiCache replication groups are encrypted at rest.",
-    "priority": 1,
-    "priorityReason": "Encryption at rest protects sensitive data stored in ElastiCache from unauthorized access.",
-    "awsService": "ElastiCache",
-    "awsServiceCategory": "Replication Groups",
-    "bestPracticeCategory": "Security",
-    "requiredParametersForFix": [],
-    "isFixFunctionUsesDestructiveCommand": true,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeReplicationGroupsCommand",
-        "reason": "Check if encryption at rest is enabled for replication groups."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "CreateReplicationGroupCommand",
-        "reason": "Recreate the replication group with encryption enabled."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure data migration and application downtime are planned before recreating the replication group."
-  },
-  {
-    "name": "ElastiCacheReplicationGroupEncryptedInTransit",
-    "description": "Ensures that ElastiCache replication groups are encrypted in transit.",
-    "priority": 1,
-    "priorityReason": "Encryption in transit protects data from unauthorized access during transmission.",
-    "awsService": "ElastiCache",
-    "awsServiceCategory": "Replication Groups",
-    "bestPracticeCategory": "Security",
-    "requiredParametersForFix": [],
-    "isFixFunctionUsesDestructiveCommand": true,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "DescribeReplicationGroupsCommand",
-        "reason": "Check if encryption in transit is enabled for replication groups."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "CreateReplicationGroupCommand",
-        "reason": "Recreate the replication group with encryption in transit enabled."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure that enabling encryption in transit does not disrupt application connectivity."
   },
   {
     "name": "ElastiCacheSubnetGroupCheck",
@@ -2114,37 +1714,6 @@
     "adviseBeforeFixFunction": "Recreating a bucket deletes its existing data. Ensure proper data migration is planned."
   },
   {
-    "name": "S3AccessPointInVPCOnly",
-    "description": "Ensures that S3 access points are restricted to a VPC.",
-    "priority": 1,
-    "priorityReason": "Restricting access points to a VPC enhances security by limiting access to internal networks.",
-    "awsService": "S3",
-    "awsServiceCategory": "Access Points",
-    "bestPracticeCategory": "Security",
-    "requiredParametersForFix": [
-      {
-        "name": "vpcId",
-        "description": "The ID of the VPC to restrict access points to.",
-        "default": "",
-        "example": "vpc-12345678"
-      }
-    ],
-    "isFixFunctionUsesDestructiveCommand": false,
-    "commandUsedInCheckFunction": [
-      {
-        "name": "ListAccessPointsCommand",
-        "reason": "Retrieve the list of S3 access points."
-      }
-    ],
-    "commandUsedInFixFunction": [
-      {
-        "name": "UpdateAccessPointCommand",
-        "reason": "Restrict the access point to a specified VPC."
-      }
-    ],
-    "adviseBeforeFixFunction": "Ensure the specified VPC is correctly configured for S3 access."
-  },
-  {
     "name": "SecretsManagerRotationEnabledCheck",
     "description": "Ensures that secret rotation is enabled for AWS Secrets Manager secrets.",
     "priority": 1,
@@ -2460,5 +2029,1121 @@
       }
     ],
     "adviseBeforeFixFunction": "Ensure no critical dependencies are relying on the default security group rules."
+  },
+  {
+    "name": "WAFv2LoggingEnabled",
+    "description": "Ensures that logging is enabled for WAFv2 Web ACLs.",
+    "priority": 1,
+    "priorityReason": "Logging provides visibility into WAF actions and helps in auditing and debugging.",
+    "awsService": "WAFv2",
+    "awsServiceCategory": "Web ACLs",
+    "bestPracticeCategory": "Monitoring",
+    "requiredParametersForFix": [
+      {
+        "name": "logDestinationArn",
+        "description": "The ARN of the log group or Kinesis Data Firehose for logging.",
+        "default": "",
+        "example": "arn:aws:logs:us-east-1:123456789012:log-group:WAFLogs"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetLoggingConfigurationCommand",
+        "reason": "Check if logging is enabled for WAF Web ACLs."
+      },
+      {
+        "name": "ListWebACLsCommand",
+        "reason": "Retrieve the list of Web ACLs."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutLoggingConfigurationCommand",
+        "reason": "Enable logging for WAF Web ACLs."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the log destination (CloudWatch Logs or Kinesis Data Firehose) is configured correctly."
+  },
+  {
+    "name": "WAFv2RuleGroupLoggingEnabled",
+    "description": "Ensures that logging is enabled for WAFv2 Rule Groups.",
+    "priority": 2,
+    "priorityReason": "Logging for Rule Groups provides visibility into their actions, helping in auditing and debugging.",
+    "awsService": "WAFv2",
+    "awsServiceCategory": "Rule Groups",
+    "bestPracticeCategory": "Monitoring",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetRuleGroupCommand",
+        "reason": "Retrieve the details of WAF Rule Groups to check their logging configuration."
+      },
+      {
+        "name": "ListRuleGroupsCommand",
+        "reason": "Retrieve the list of Rule Groups."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "UpdateRuleGroupCommand",
+        "reason": "Enable logging for the WAF Rule Group."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure metrics and logs are enabled for related Rule Groups."
+  },
+  {
+    "name": "WAFv2RuleGroupNotEmpty",
+    "description": "Ensures that WAFv2 Rule Groups are not empty.",
+    "priority": 2,
+    "priorityReason": "Empty Rule Groups do not provide any protective measures, making them ineffective.",
+    "awsService": "WAFv2",
+    "awsServiceCategory": "Rule Groups",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "rules",
+        "description": "The rules to be added to the Rule Group.",
+        "default": "",
+        "example": "[{\"Name\": \"IPBlock\", \"Priority\": 1, \"Statement\": {\"IPSetReferenceStatement\": {\"ARN\": \"arn:aws:wafv2:...\"}}}]"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetRuleGroupCommand",
+        "reason": "Retrieve details of Rule Groups and check if they contain rules."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "UpdateRuleGroupCommand",
+        "reason": "Add rules to the Rule Group."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the new rules do not conflict with existing configurations."
+  },
+  {
+    "name": "WAFv2WebACLNotEmpty",
+    "description": "Ensures that WAFv2 Web ACLs contain at least one rule.",
+    "priority": 1,
+    "priorityReason": "Web ACLs without rules do not provide any protection against unwanted traffic.",
+    "awsService": "WAFv2",
+    "awsServiceCategory": "Web ACLs",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "rules",
+        "description": "The rules to be added to the Web ACL.",
+        "default": "",
+        "example": "[{\"Name\": \"BlockBadActors\", \"Priority\": 1, \"Statement\": {\"IPSetReferenceStatement\": {\"ARN\": \"arn:aws:wafv2:...\"}}}]"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetWebACLCommand",
+        "reason": "Retrieve details of Web ACLs to check if they contain rules."
+      },
+      {
+        "name": "ListWebACLsCommand",
+        "reason": "Retrieve the list of Web ACLs."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "UpdateWebACLCommand",
+        "reason": "Add rules to the Web ACL."
+      }
+    ],
+    "adviseBeforeFixFunction": "Review the rules to ensure they align with your organization's security policies."
+  },
+  {
+    "name": "RestrictedCommonPorts",
+    "description": "Ensures that security groups restrict access to common ports such as HTTP, SSH, MySQL, and others.",
+    "priority": 1,
+    "priorityReason": "Restricting access to common ports minimizes the risk of unauthorized access.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Security Groups",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": true,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeSecurityGroupRulesCommand",
+        "reason": "Retrieve the security group rules to check for unrestricted access to common ports."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "RevokeSecurityGroupIngressCommand",
+        "reason": "Revoke ingress rules that allow unrestricted access to common ports."
+      }
+    ],
+    "adviseBeforeFixFunction": "Review and confirm which ports need to remain open for critical operations."
+  },
+  {
+    "name": "VPCNetworkACLUnusedCheck",
+    "description": "Ensures that unused network ACLs are identified and marked for removal or optimization.",
+    "priority": 2,
+    "priorityReason": "Unused network ACLs increase administrative overhead and pose a potential security risk if misconfigured.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Network ACLs",
+    "bestPracticeCategory": "Optimization",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeNetworkAclsCommand",
+        "reason": "Retrieve the list of network ACLs to check for unused ones."
+      }
+    ],
+    "commandUsedInFixFunction": [],
+    "adviseBeforeFixFunction": "Ensure that identified unused ACLs are truly unlinked before removing them."
+  },
+  {
+    "name": "VPCPeeringDNSResolutionCheck",
+    "description": "Ensures that VPC peering connections have DNS resolution enabled.",
+    "priority": 1,
+    "priorityReason": "Enabling DNS resolution improves connectivity and simplifies resource management across peered VPCs.",
+    "awsService": "EC2",
+    "awsServiceCategory": "VPC Peering",
+    "bestPracticeCategory": "Networking",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeVpcPeeringConnectionsCommand",
+        "reason": "Retrieve the list of VPC peering connections and their DNS resolution settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyVpcPeeringConnectionOptionsCommand",
+        "reason": "Enable DNS resolution for the VPC peering connection."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the VPCs involved in the peering connection require DNS resolution."
+  },
+  {
+    "name": "VPCSGOpenOnlyToAuthorizedPorts",
+    "description": "Ensures that security groups are only open to authorized ports and IP ranges.",
+    "priority": 1,
+    "priorityReason": "Restricting security groups to authorized ports minimizes the risk of exposure to unauthorized access.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Security Groups",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "authorizedPorts",
+        "description": "A list of ports authorized for access.",
+        "default": "[80, 443]",
+        "example": "[80, 443]"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": true,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeSecurityGroupRulesCommand",
+        "reason": "Retrieve security group rules to identify unauthorized open ports."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "RevokeSecurityGroupIngressCommand",
+        "reason": "Revoke unauthorized ingress rules from security groups."
+      }
+    ],
+    "adviseBeforeFixFunction": "Validate the list of authorized ports to ensure it meets operational requirements."
+  },
+  {
+    "name": "S3AccessPointInVpcOnly",
+    "description": "Ensures that S3 access points are restricted to VPCs.",
+    "priority": 1,
+    "priorityReason": "Restricting access points to VPCs enhances security by preventing public access.",
+    "awsService": "S3",
+    "awsServiceCategory": "Access Points",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "vpcId",
+        "description": "The ID of the VPC to which the access point should be restricted.",
+        "default": "",
+        "example": "vpc-12345678"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "ListAccessPointsCommand",
+        "reason": "Retrieve S3 access points to verify VPC-only settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "UpdateAccessPointCommand",
+        "reason": "Restrict the access point to a specific VPC."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the target VPC is configured correctly to support S3 access."
+  },
+  {
+    "name": "S3BucketLevelPublicAccessProhibited",
+    "description": "Ensures that public access to S3 buckets is restricted.",
+    "priority": 1,
+    "priorityReason": "Restricting public access protects data in the S3 bucket from unauthorized users.",
+    "awsService": "S3",
+    "awsServiceCategory": "Buckets",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetPublicAccessBlockCommand",
+        "reason": "Retrieve public access block settings for S3 buckets."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutPublicAccessBlockCommand",
+        "reason": "Restrict public access to the S3 bucket by enabling public access blocks."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that no applications require public access to the bucket before applying restrictions."
+  },
+  {
+    "name": "S3DefaultEncryptionKMS",
+    "description": "Ensures that S3 buckets have default encryption enabled using a KMS key.",
+    "priority": 1,
+    "priorityReason": "Default encryption ensures that all objects stored in the bucket are encrypted, protecting sensitive data.",
+    "awsService": "S3",
+    "awsServiceCategory": "Buckets",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "kmsKeyId",
+        "description": "The KMS key ID or ARN to enable default encryption.",
+        "default": "",
+        "example": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ef-ghij-klmnopqrstuv"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetBucketEncryptionCommand",
+        "reason": "Check if default encryption is enabled for the bucket."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutBucketEncryptionCommand",
+        "reason": "Enable default encryption for the bucket."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the KMS key has the necessary permissions to encrypt and decrypt objects."
+  },
+  {
+    "name": "S3EventNotificationsEnabled",
+    "description": "Ensures that S3 buckets have event notifications enabled for Lambda, SQS, or SNS.",
+    "priority": 2,
+    "priorityReason": "Event notifications facilitate real-time monitoring and automation, improving operational efficiency.",
+    "awsService": "S3",
+    "awsServiceCategory": "Buckets",
+    "bestPracticeCategory": "Monitoring",
+    "requiredParametersForFix": [
+      {
+        "name": "eventNotificationConfig",
+        "description": "The event notification configuration to apply.",
+        "default": "",
+        "example": "{ \"LambdaFunctionConfigurations\": [...] }"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetBucketNotificationConfigurationCommand",
+        "reason": "Retrieve the event notification configuration for the bucket."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutBucketNotificationConfigurationCommand",
+        "reason": "Enable event notifications for the bucket."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the configured notification targets (Lambda, SQS, SNS) are ready to handle events."
+  },
+  {
+    "name": "S3LastBackupRecoveryPointCreated",
+    "description": "Ensures that S3 buckets have recent recovery points created within the last 24 hours.",
+    "priority": 1,
+    "priorityReason": "Regular backups ensure data integrity and recoverability in case of data loss.",
+    "awsService": "S3",
+    "awsServiceCategory": "Buckets",
+    "bestPracticeCategory": "Backup",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "ListRecoveryPointsByResourceCommand",
+        "reason": "Check the recovery points for the S3 bucket."
+      }
+    ],
+    "commandUsedInFixFunction": [],
+    "adviseBeforeFixFunction": "Ensure the backup mechanism is configured to create recovery points regularly."
+  },
+  {
+    "name": "S3LifecyclePolicyCheck",
+    "description": "Ensures that S3 buckets have lifecycle policies configured for managing object transitions and expirations.",
+    "priority": 2,
+    "priorityReason": "Lifecycle policies help optimize storage costs by managing object transitions and deletions.",
+    "awsService": "S3",
+    "awsServiceCategory": "Buckets",
+    "bestPracticeCategory": "Optimization",
+    "requiredParametersForFix": [
+      {
+        "name": "lifecyclePolicy",
+        "description": "The lifecycle policy to apply to the bucket.",
+        "default": "",
+        "example": "{ \"Rules\": [...] }"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetBucketLifecycleConfigurationCommand",
+        "reason": "Retrieve the lifecycle configuration for the bucket."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutBucketLifecycleConfigurationCommand",
+        "reason": "Apply lifecycle policies to the bucket."
+      }
+    ],
+    "adviseBeforeFixFunction": "Review lifecycle rules to ensure they align with data retention policies."
+  },
+  {
+    "name": "RDSClusterAutoMinorVersionUpgradeEnabled",
+    "description": "Ensures that RDS clusters have auto minor version upgrades enabled.",
+    "priority": 2,
+    "priorityReason": "Auto minor version upgrades ensure that RDS clusters stay up-to-date with the latest security and bug fixes.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Clusters",
+    "bestPracticeCategory": "Maintenance",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBClustersCommand",
+        "reason": "Retrieve details of RDS clusters to check auto minor version upgrade settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyDBClusterCommand",
+        "reason": "Enable auto minor version upgrades for the RDS cluster."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that enabling auto minor upgrades does not disrupt application compatibility."
+  },
+  {
+    "name": "RDSClusterDefaultAdminCheck",
+    "description": "Ensures that RDS clusters do not use default admin usernames like 'admin' or 'postgres'.",
+    "priority": 1,
+    "priorityReason": "Using non-default admin usernames reduces the risk of brute-force attacks.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Clusters",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBClustersCommand",
+        "reason": "Retrieve details of RDS clusters to check admin usernames."
+      }
+    ],
+    "commandUsedInFixFunction": [],
+    "adviseBeforeFixFunction": "Consider re-creating clusters with non-default admin usernames to enhance security."
+  },
+  {
+    "name": "RDSClusterMultiAZEnabled",
+    "description": "Ensures that RDS clusters are configured for Multi-AZ deployments.",
+    "priority": 1,
+    "priorityReason": "Multi-AZ deployments provide high availability and fault tolerance for RDS clusters.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Clusters",
+    "bestPracticeCategory": "Reliability",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBClustersCommand",
+        "reason": "Retrieve details of RDS clusters to check Multi-AZ settings."
+      }
+    ],
+    "commandUsedInFixFunction": [],
+    "adviseBeforeFixFunction": "Ensure applications can tolerate a potential brief downtime during Multi-AZ deployment configuration."
+  },
+  {
+    "name": "RDSDBSecurityGroupNotAllowed",
+    "description": "Ensures that RDS clusters do not use default security groups.",
+    "priority": 1,
+    "priorityReason": "Using custom security groups reduces the risk of unintended access to the database.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Clusters",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBClustersCommand",
+        "reason": "Retrieve details of RDS clusters and their associated security groups."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyDBClusterCommand",
+        "reason": "Assign a custom security group to the RDS cluster."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the custom security group allows only authorized traffic."
+  },
+  {
+    "name": "RDSEnhancedMonitoringEnabled",
+    "description": "Ensures that enhanced monitoring is enabled for RDS instances.",
+    "priority": 2,
+    "priorityReason": "Enhanced monitoring provides deeper insights into database performance and resource usage.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Monitoring",
+    "requiredParametersForFix": [
+      {
+        "name": "monitoringRoleArn",
+        "description": "The ARN of the IAM role used for enhanced monitoring.",
+        "default": "",
+        "example": "arn:aws:iam::123456789012:role/RDSMonitoringRole"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBInstancesCommand",
+        "reason": "Retrieve details of RDS instances to check monitoring settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyDBInstanceCommand",
+        "reason": "Enable enhanced monitoring for the RDS instance."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the monitoring IAM role is properly configured with the required permissions."
+  },
+  {
+    "name": "RDSInstancePublicAccessCheck",
+    "description": "Ensures that RDS instances are not publicly accessible.",
+    "priority": 1,
+    "priorityReason": "Restricting public access reduces the risk of unauthorized access to databases.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBInstancesCommand",
+        "reason": "Retrieve details of RDS instances to check public accessibility."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyDBInstanceCommand",
+        "reason": "Disable public accessibility for the RDS instance."
+      }
+    ],
+    "adviseBeforeFixFunction": "Verify that applications accessing the database are within the same VPC or have secure connectivity."
+  },
+  {
+    "name": "RDSLoggingEnabled",
+    "description": "Ensures that RDS clusters have logging enabled for supported log types.",
+    "priority": 1,
+    "priorityReason": "Enabling logging provides visibility into database activity and assists with compliance and debugging.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Clusters",
+    "bestPracticeCategory": "Monitoring",
+    "requiredParametersForFix": [
+      {
+        "name": "logTypes",
+        "description": "The list of log types to enable for the RDS cluster.",
+        "default": "",
+        "example": "[\"audit\", \"error\", \"general\", \"slowquery\"]"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBClustersCommand",
+        "reason": "Retrieve details of RDS clusters to check their logging settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyDBClusterCommand",
+        "reason": "Enable logging for the RDS cluster."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the enabled log types align with monitoring and compliance requirements."
+  },
+  {
+    "name": "RDSSnapshotEncrypted",
+    "description": "Ensures that RDS snapshots are encrypted.",
+    "priority": 1,
+    "priorityReason": "Encrypting snapshots protects sensitive data stored in backups.",
+    "awsService": "RDS",
+    "awsServiceCategory": "Snapshots",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "kmsKeyId",
+        "description": "The KMS key ID or ARN to use for snapshot encryption.",
+        "default": "",
+        "example": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ef-ghij-klmnopqrstuv"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeDBClusterSnapshotsCommand",
+        "reason": "Retrieve details of RDS snapshots to check their encryption status."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "CopyDBClusterSnapshotCommand",
+        "reason": "Create an encrypted copy of an unencrypted snapshot."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the KMS key is configured with the appropriate permissions for snapshot encryption."
+  },
+  {
+    "name": "ElastiCacheReplGrpAutoFailoverEnabled",
+    "description": "Ensures that automatic failover is enabled for ElastiCache replication groups.",
+    "priority": 1,
+    "priorityReason": "Automatic failover provides high availability and reduces downtime in case of failures.",
+    "awsService": "ElastiCache",
+    "awsServiceCategory": "Replication Groups",
+    "bestPracticeCategory": "Reliability",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeReplicationGroupsCommand",
+        "reason": "Retrieve details of ElastiCache replication groups to check their failover settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyReplicationGroupCommand",
+        "reason": "Enable automatic failover for the replication group."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the replication group is configured for high availability."
+  },
+  {
+    "name": "ElastiCacheReplGrpEncryptedAtRest",
+    "description": "Ensures that ElastiCache replication groups are encrypted at rest.",
+    "priority": 1,
+    "priorityReason": "Encrypting data at rest protects it from unauthorized access in storage.",
+    "awsService": "ElastiCache",
+    "awsServiceCategory": "Replication Groups",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeReplicationGroupsCommand",
+        "reason": "Retrieve details of ElastiCache replication groups to check their encryption settings."
+      }
+    ],
+    "commandUsedInFixFunction": [],
+    "adviseBeforeFixFunction": "Encryption at rest must be enabled at the time of cluster creation."
+  },
+  {
+    "name": "ElastiCacheReplGrpEncryptedInTransit",
+    "description": "Ensures that ElastiCache replication groups are encrypted in transit.",
+    "priority": 1,
+    "priorityReason": "Encrypting data in transit protects it from interception during communication.",
+    "awsService": "ElastiCache",
+    "awsServiceCategory": "Replication Groups",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeReplicationGroupsCommand",
+        "reason": "Retrieve details of ElastiCache replication groups to check their in-transit encryption settings."
+      }
+    ],
+    "commandUsedInFixFunction": [],
+    "adviseBeforeFixFunction": "In-transit encryption must be enabled at the time of cluster creation."
+  },
+  {
+    "name": "ECSAwsVpcNetworkingEnabled",
+    "description": "Ensures that ECS task definitions use the awsvpc networking mode.",
+    "priority": 1,
+    "priorityReason": "Using awsvpc networking mode ensures that tasks receive their own elastic network interfaces for enhanced security.",
+    "awsService": "ECS",
+    "awsServiceCategory": "Task Definitions",
+    "bestPracticeCategory": "Networking",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": true,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeTaskDefinitionCommand",
+        "reason": "Retrieve details of ECS task definitions to check their network mode."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "RegisterTaskDefinitionCommand",
+        "reason": "Re-register the task definition with the awsvpc networking mode."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the VPC and subnets are configured to support the awsvpc networking mode."
+  },
+  {
+    "name": "ECSContainersReadonlyAccess",
+    "description": "Ensures that ECS containers are configured with read-only root file systems.",
+    "priority": 2,
+    "priorityReason": "Using read-only root file systems reduces the risk of unauthorized changes to the container's file system.",
+    "awsService": "ECS",
+    "awsServiceCategory": "Task Definitions",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": true,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeTaskDefinitionCommand",
+        "reason": "Retrieve details of ECS task definitions to check container file system permissions."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "RegisterTaskDefinitionCommand",
+        "reason": "Re-register the task definition with read-only root file systems for containers."
+      }
+    ],
+    "adviseBeforeFixFunction": "Verify that the application does not require write access to the container's root file system."
+  },
+  {
+    "name": "ECSFargateLatestPlatformVersion",
+    "description": "Ensures that ECS services use the latest Fargate platform version.",
+    "priority": 2,
+    "priorityReason": "Using the latest platform version ensures access to the latest features and bug fixes.",
+    "awsService": "ECS",
+    "awsServiceCategory": "Services",
+    "bestPracticeCategory": "Maintenance",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeServicesCommand",
+        "reason": "Retrieve details of ECS services to check their platform version."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "UpdateServiceCommand",
+        "reason": "Update the service to use the latest Fargate platform version."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that updating the platform version does not disrupt service operations."
+  },
+  {
+    "name": "ECRKmsEncryption1",
+    "description": "Ensures that ECR repositories are encrypted using KMS keys.",
+    "priority": 1,
+    "priorityReason": "Encrypting ECR repositories with KMS keys protects sensitive data from unauthorized access.",
+    "awsService": "ECR",
+    "awsServiceCategory": "Repositories",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "kmsKeyId",
+        "description": "The KMS key ID or ARN to use for encryption.",
+        "default": "",
+        "example": "arn:aws:kms:us-east-1:123456789012:key/abcd1234-5678-90ef-ghij-klmnopqrstuv"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeRepositoriesCommand",
+        "reason": "Retrieve details of ECR repositories to check their encryption settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutEncryptionConfigurationCommand",
+        "reason": "Enable KMS encryption for the ECR repository."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the KMS key is properly configured with permissions to encrypt and decrypt ECR repository data."
+  },
+  {
+    "name": "EC2EbsEncryptionByDefault",
+    "description": "Ensures that EBS volumes are encrypted by default.",
+    "priority": 1,
+    "priorityReason": "Default encryption ensures all newly created EBS volumes are protected by encryption.",
+    "awsService": "EC2",
+    "awsServiceCategory": "EBS",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetEbsEncryptionByDefaultCommand",
+        "reason": "Check if EBS encryption by default is enabled."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "EnableEbsEncryptionByDefaultCommand",
+        "reason": "Enable EBS encryption by default."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that encryption requirements align with organizational security policies."
+  },
+  {
+    "name": "EC2Imdsv2Check",
+    "description": "Ensures that EC2 instances require IMDSv2 for metadata access.",
+    "priority": 1,
+    "priorityReason": "Requiring IMDSv2 improves instance metadata security by preventing SSRF attacks.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeInstancesCommand",
+        "reason": "Retrieve details of EC2 instances to check their metadata options."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyInstanceMetadataOptionsCommand",
+        "reason": "Enforce IMDSv2 on EC2 instances."
+      }
+    ],
+    "adviseBeforeFixFunction": "Verify that applications using instance metadata are compatible with IMDSv2."
+  },
+  {
+    "name": "EC2InstanceDetailedMonitoringEnabled",
+    "description": "Ensures that EC2 instances have detailed monitoring enabled.",
+    "priority": 2,
+    "priorityReason": "Detailed monitoring provides granular metrics for resource usage and performance analysis.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Monitoring",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeInstancesCommand",
+        "reason": "Retrieve details of EC2 instances to check their monitoring state."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "MonitorInstancesCommand",
+        "reason": "Enable detailed monitoring on EC2 instances."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that enabling detailed monitoring aligns with operational requirements."
+  },
+  {
+    "name": "EC2InstanceManagedBySystemsManager",
+    "description": "Ensures that EC2 instances are managed by AWS Systems Manager.",
+    "priority": 2,
+    "priorityReason": "Using Systems Manager simplifies management tasks such as patching, configuration, and automation.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Management",
+    "requiredParametersForFix": [
+      {
+        "name": "iamRole",
+        "description": "The IAM role to attach to the instance for Systems Manager.",
+        "default": "",
+        "example": "arn:aws:iam::123456789012:role/SSMRole"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeInstanceInformationCommand",
+        "reason": "Check if instances are registered with Systems Manager."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "AttachIamInstanceProfileCommand",
+        "reason": "Attach an IAM role that enables Systems Manager to manage the instance."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the IAM role has the necessary permissions for Systems Manager operations."
+  },
+  {
+    "name": "EC2NoAmazonKeyPair",
+    "description": "Ensures that EC2 instances do not use Amazon-provided key pairs for authentication.",
+    "priority": 1,
+    "priorityReason": "Using custom key pairs ensures that access to EC2 instances is controlled by the organization.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "newKeyPair",
+        "description": "The custom key pair to use for the EC2 instance.",
+        "default": "",
+        "example": "my-custom-keypair"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": true,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeInstancesCommand",
+        "reason": "Retrieve details of EC2 instances to check their key pair settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "RecreateInstanceWithNewKeyPairCommand",
+        "reason": "Recreate the instance with a custom key pair."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the new key pair is securely stored and accessible."
+  },
+  {
+    "name": "EC2TokenHopLimitCheck",
+    "description": "Ensures that EC2 instance metadata service has a low token hop limit configured.",
+    "priority": 2,
+    "priorityReason": "Reducing the hop limit minimizes the risk of metadata interception in multi-hop scenarios.",
+    "awsService": "EC2",
+    "awsServiceCategory": "Instances",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "hopLimit",
+        "description": "The maximum number of hops allowed for the metadata service.",
+        "default": "1",
+        "example": "1"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeInstancesCommand",
+        "reason": "Retrieve details of EC2 instances to check their metadata service hop limit."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyInstanceMetadataOptionsCommand",
+        "reason": "Set the hop limit for the instance metadata service."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the hop limit setting does not interfere with legitimate application behavior."
+  },
+  {
+    "name": "DynamoDBTableEncryptionEnabled",
+    "description": "Ensures that DynamoDB tables are encrypted at rest.",
+    "priority": 1,
+    "priorityReason": "Encrypting DynamoDB tables protects sensitive data stored in the database.",
+    "awsService": "DynamoDB",
+    "awsServiceCategory": "Tables",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeTableCommand",
+        "reason": "Retrieve details of DynamoDB tables to check their encryption settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "UpdateTableCommand",
+        "reason": "Enable encryption for the DynamoDB table."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that enabling encryption aligns with your organization's data security policies."
+  },
+  {
+    "name": "CWLogGroupRetentionPeriodCheck",
+    "description": "Ensures that CloudWatch log groups have a defined retention period.",
+    "priority": 2,
+    "priorityReason": "Defining a retention period reduces storage costs and ensures logs are not kept indefinitely.",
+    "awsService": "CloudWatch",
+    "awsServiceCategory": "Logs",
+    "bestPracticeCategory": "Cost Optimization",
+    "requiredParametersForFix": [
+      {
+        "name": "retentionDays",
+        "description": "The number of days to retain log data.",
+        "default": "30",
+        "example": "7"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeLogGroupsCommand",
+        "reason": "Retrieve details of CloudWatch log groups to check their retention settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "PutRetentionPolicyCommand",
+        "reason": "Set the retention period for CloudWatch log groups."
+      }
+    ],
+    "adviseBeforeFixFunction": "Choose a retention period that balances storage costs and compliance requirements."
+  },
+  {
+    "name": "CloudFrontS3OriginAccessControlEnabled",
+    "description": "Ensures that CloudFront distributions with S3 origins have origin access control enabled.",
+    "priority": 1,
+    "priorityReason": "Using origin access control restricts access to S3 buckets, enhancing security.",
+    "awsService": "CloudFront",
+    "awsServiceCategory": "Distributions",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetDistributionCommand",
+        "reason": "Retrieve CloudFront distribution configurations to check origin access settings."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "UpdateDistributionCommand",
+        "reason": "Enable origin access control for CloudFront distributions."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that enabling origin access control does not disrupt existing functionality."
+  },
+  {
+    "name": "ALBWAFEnabled",
+    "description": "Ensures that WAF is associated with ALBs.",
+    "priority": 1,
+    "priorityReason": "Associating WAF with ALBs protects against common web attacks.",
+    "awsService": "Elastic Load Balancing",
+    "awsServiceCategory": "Application Load Balancer",
+    "bestPracticeCategory": "Security",
+    "requiredParametersForFix": [
+      {
+        "name": "webAclArn",
+        "description": "The ARN of the WAF ACL to associate with the ALB.",
+        "default": "",
+        "example": "arn:aws:wafv2:us-east-1:123456789012:regional/webacl/example"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "GetWebAclForResourceCommand",
+        "reason": "Check if a WAF is associated with the ALB."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "AssociateWebAclCommand",
+        "reason": "Associate a WAF ACL with the ALB."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure the WAF ACL has the appropriate rules for the application's requirements."
+  },
+  {
+    "name": "ELBCrossZoneLoadBalancingEnabled",
+    "description": "Ensures that cross-zone load balancing is enabled for load balancers.",
+    "priority": 2,
+    "priorityReason": "Cross-zone load balancing distributes traffic evenly across all registered targets.",
+    "awsService": "Elastic Load Balancing",
+    "awsServiceCategory": "Load Balancer",
+    "bestPracticeCategory": "Reliability",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeLoadBalancerAttributesCommand",
+        "reason": "Check if cross-zone load balancing is enabled for load balancers."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyLoadBalancerAttributesCommand",
+        "reason": "Enable cross-zone load balancing for load balancers."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure enabling cross-zone load balancing aligns with traffic distribution goals."
+  },
+  {
+    "name": "ELBDeletionProtectionEnabled",
+    "description": "Ensures that deletion protection is enabled for load balancers.",
+    "priority": 1,
+    "priorityReason": "Enabling deletion protection prevents accidental deletion of load balancers.",
+    "awsService": "Elastic Load Balancing",
+    "awsServiceCategory": "Load Balancer",
+    "bestPracticeCategory": "Reliability",
+    "requiredParametersForFix": [],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeLoadBalancerAttributesCommand",
+        "reason": "Check if deletion protection is enabled for load balancers."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyLoadBalancerAttributesCommand",
+        "reason": "Enable deletion protection for load balancers."
+      }
+    ],
+    "adviseBeforeFixFunction": "Verify that deletion protection is necessary for the load balancer's lifecycle management."
+  },
+  {
+    "name": "ELBLoggingEnabled",
+    "description": "Ensures that access logs are enabled for load balancers.",
+    "priority": 1,
+    "priorityReason": "Enabling access logs helps with debugging and analyzing traffic patterns.",
+    "awsService": "Elastic Load Balancing",
+    "awsServiceCategory": "Load Balancer",
+    "bestPracticeCategory": "Monitoring",
+    "requiredParametersForFix": [
+      {
+        "name": "s3BucketName",
+        "description": "The S3 bucket to store access logs.",
+        "default": "",
+        "example": "my-logs-bucket"
+      }
+    ],
+    "isFixFunctionUsesDestructiveCommand": false,
+    "commandUsedInCheckFunction": [
+      {
+        "name": "DescribeLoadBalancerAttributesCommand",
+        "reason": "Check if access logging is enabled for load balancers."
+      }
+    ],
+    "commandUsedInFixFunction": [
+      {
+        "name": "ModifyLoadBalancerAttributesCommand",
+        "reason": "Enable access logs for load balancers."
+      }
+    ],
+    "adviseBeforeFixFunction": "Ensure that the specified S3 bucket exists and has permissions to receive access logs."
   }
 ]
