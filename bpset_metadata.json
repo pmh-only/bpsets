@@ -4,7 +4,7 @@
     "description": "Ensures that the ALB is configured to drop invalid HTTP headers.",
     "priority": 1,
     "priorityReason": "Invalid headers can introduce security vulnerabilities.",
-    "awsService": "ELBv2",
+    "awsService": "Elastic Load Balancing",
     "awsServiceCategory": "Application Load Balancer",
     "bestPracticeCategory": "Security",
     "requiredParametersForFix": [],

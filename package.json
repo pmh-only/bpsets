@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "main": "dist/main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "rimraf ./dist && tsc",
     "start": "node .",
-    "dev": "nodemon -e ts --exec \"tsc && node . || exit 1\""
+    "dev": "nodemon -e ts --exec \"rimraf ./dist && tsc && node . || exit 1\""
   },
   "author": "Minhyeok Park<pmh_only@pmh.codes>",
   "license": "MIT",
@@ -39,7 +39,9 @@
     "@aws-sdk/client-sts": "^3.716.0",
     "@aws-sdk/client-wafv2": "^3.716.0",
     "@smithy/smithy-client": "^3.5.1",
+    "ejs": "^3.1.10",
     "express": "^4.21.2",
+    "rimraf": "^6.0.1",
     "sha.js": "^2.4.11"
   },
   "devDependencies": {

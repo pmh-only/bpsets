@@ -1,21 +1,44 @@
 import express, { Request, Response } from 'express'
-import { APIServer } from './APIServer'
+import { BPManager } from './BPManager'
+import { BPSetMetadata } from './types'
 
 export class WebServer {  
   private readonly app = express()
-  private readonly apiServer = new APIServer()
+  private readonly bpManager =
+    BPManager.getInstance()
 
   constructor (
     private readonly port = 2424
   ) {
-    this.initRoutes()
+    this.app.set('view engine', 'ejs')
+    this.app.set('views', './views');
+    this.app.use(express.static('./public'))
+    
+    this.app.get('/', this.getMainPage.bind(this))
+    this.app.use(this.error404)
+    
     this.app.listen(this.port, this.showBanner.bind(this))
   }
   
-  private initRoutes () {
-    this.app.use(express.static('./public'))
-    this.app.use('/api', this.apiServer.getRouter())
-    this.app.use(this.error404)
+  private getMainPage(_: Request, res: Response) {
+    const bpStatus: {
+      category: string,
+      metadatas: BPSetMetadata[]
+    }[] = []
+
+    const bpMetadatas = this.bpManager.getBPSetMetadatas()
+    const categories = new Set(bpMetadatas.map((v) => v?.awsService))
+
+    for (const category of categories)
+      bpStatus.push({
+        category,
+        metadatas: bpMetadatas.filter((v) => v.awsService === category)
+      })
+
+    res.render('index', {
+      bpStatus,
+      bpLength: bpMetadatas.length
+    })
   }
 
   private error404 (_: Request, res: Response) {

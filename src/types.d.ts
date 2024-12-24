@@ -47,4 +47,8 @@ export interface BPSetMetadata {
     reason: string
   }[]
   adviseBeforeFixFunction: string
+  nonCompliantResources: string[]
+  compliantResources: string[]
+  status: 'LOADED' | 'CHECKING' | 'ERROR' | 'FINISHED'
+  idx: number
 }
