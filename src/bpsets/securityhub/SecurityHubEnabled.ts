@@ -4,7 +4,7 @@ import {
   EnableSecurityHubCommand
 } from '@aws-sdk/client-securityhub'
 import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class SecurityHubEnabled implements BPSet {

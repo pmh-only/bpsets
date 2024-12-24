@@ -4,7 +4,7 @@ import {
   GetStagesCommand
 } from '@aws-sdk/client-apigatewayv2'
 import { WAFV2Client, GetWebACLForResourceCommand, AssociateWebACLCommand } from '@aws-sdk/client-wafv2'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class APIGatewayAssociatedWithWAF implements BPSet {

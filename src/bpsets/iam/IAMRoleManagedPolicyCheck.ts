@@ -3,7 +3,7 @@ import {
   ListPoliciesCommand,
   ListEntitiesForPolicyCommand
 } from '@aws-sdk/client-iam'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class IAMRoleManagedPolicyCheck implements BPSet {

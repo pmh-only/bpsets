@@ -4,7 +4,7 @@ import {
   BatchGetProjectsCommand,
   UpdateProjectCommand
 } from '@aws-sdk/client-codebuild'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class CodeBuildProjectEnvironmentPrivilegedCheck implements BPSet {

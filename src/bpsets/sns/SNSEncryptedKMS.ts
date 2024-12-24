@@ -4,7 +4,7 @@ import {
   GetTopicAttributesCommand,
   SetTopicAttributesCommand
 } from '@aws-sdk/client-sns'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class SNSEncryptedKMS implements BPSet {

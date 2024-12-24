@@ -4,7 +4,7 @@ import {
   GetRuleGroupCommand,
   UpdateRuleGroupCommand,
 } from '@aws-sdk/client-wafv2';
-import { BPSet } from '../BPSet';
+import { BPSet } from '../../types';
 import { Memorizer } from '../../Memorizer';
 
 export class WAFv2RuleGroupLoggingEnabled implements BPSet {

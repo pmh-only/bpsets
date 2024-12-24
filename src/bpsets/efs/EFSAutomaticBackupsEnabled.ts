@@ -4,7 +4,7 @@ import {
   PutBackupPolicyCommand,
   DescribeBackupPolicyCommand
 } from '@aws-sdk/client-efs'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class EFSAutomaticBackupsEnabled implements BPSet {

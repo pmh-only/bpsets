@@ -4,7 +4,7 @@ import {
   DescribeTableCommand,
   UpdateTableCommand
 } from '@aws-sdk/client-dynamodb'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class DynamoDBTableEncryptedKMS implements BPSet {

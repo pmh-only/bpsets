@@ -3,7 +3,7 @@ import {
   DescribeAlarmsCommand,
   PutMetricAlarmCommand
 } from '@aws-sdk/client-cloudwatch'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class CloudWatchAlarmSettingsCheck implements BPSet {

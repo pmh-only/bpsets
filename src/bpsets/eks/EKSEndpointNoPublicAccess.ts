@@ -4,7 +4,7 @@ import {
   DescribeClusterCommand,
   UpdateClusterConfigCommand
 } from '@aws-sdk/client-eks'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class EKSEndpointNoPublicAccess implements BPSet {

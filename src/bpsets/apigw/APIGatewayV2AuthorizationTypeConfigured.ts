@@ -4,7 +4,7 @@ import {
   GetRoutesCommand,
   UpdateRouteCommand
 } from '@aws-sdk/client-apigatewayv2'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class APIGatewayV2AuthorizationTypeConfigured implements BPSet {

@@ -3,7 +3,7 @@ import {
   DescribeCacheClustersCommand,
   ModifyCacheClusterCommand
 } from '@aws-sdk/client-elasticache'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ElastiCacheAutoMinorVersionUpgradeCheck implements BPSet {

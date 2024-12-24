@@ -3,7 +3,7 @@ import {
   DescribeDBClusterSnapshotsCommand,
   CopyDBClusterSnapshotCommand
 } from '@aws-sdk/client-rds'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class RDSSnapshotEncrypted implements BPSet {

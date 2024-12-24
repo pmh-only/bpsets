@@ -4,7 +4,7 @@ import {
   DescribeTaskDefinitionCommand,
   RegisterTaskDefinitionCommand
 } from '@aws-sdk/client-ecs'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ECSTaskDefinitionNonRootUser implements BPSet {

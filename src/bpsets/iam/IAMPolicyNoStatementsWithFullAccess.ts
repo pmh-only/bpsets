@@ -4,7 +4,7 @@ import {
   GetPolicyVersionCommand,
   DeletePolicyCommand
 } from '@aws-sdk/client-iam'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class IAMPolicyNoStatementsWithAdminAccess implements BPSet {

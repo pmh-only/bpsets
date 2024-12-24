@@ -4,7 +4,7 @@ import {
   GetDistributionCommand,
   UpdateDistributionCommand
 } from '@aws-sdk/client-cloudfront'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class CloudFrontDefaultRootObjectConfigured implements BPSet {

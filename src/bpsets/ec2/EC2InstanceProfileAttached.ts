@@ -3,7 +3,7 @@ import {
   DescribeInstancesCommand,
   AssociateIamInstanceProfileCommand
 } from '@aws-sdk/client-ec2'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class EC2InstanceProfileAttached implements BPSet {

@@ -3,7 +3,7 @@ import {
   ListFunctionsCommand,
   UpdateFunctionConfigurationCommand
 } from '@aws-sdk/client-lambda'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class LambdaInsideVPC implements BPSet {

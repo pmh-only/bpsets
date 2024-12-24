@@ -5,7 +5,7 @@ import {
   DescribeServicesCommand,
   UpdateServiceCommand
 } from '@aws-sdk/client-ecs'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ECSFargateLatestPlatformVersion implements BPSet {

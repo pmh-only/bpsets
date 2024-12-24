@@ -3,7 +3,7 @@ import {
   DescribeRepositoriesCommand,
   PutImageScanningConfigurationCommand
 } from '@aws-sdk/client-ecr'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ECRPrivateImageScanningEnabled implements BPSet {

@@ -22,3 +22,29 @@ export interface BPSet {
     }[]
   ) => Promise<void>
 }
+
+export interface BPSetMetadata {
+  name: string
+  description: string
+  priority: number
+  priorityReason: string
+  awsService: string
+  awsServiceCategory: string
+  bestPracticeCategory: string
+  requiredParametersForFix: {
+    name: string
+    description: string
+    default: string
+    example: string
+  }[]
+  isFixFunctionUsesDestructiveCommand: boolean
+  commandUsedInCheckFunction: {
+    name: string
+    reason: string
+  }[]
+  commandUsedInFixFunction: {
+    name: string
+    reason: string
+  }[]
+  adviseBeforeFixFunction: string
+}

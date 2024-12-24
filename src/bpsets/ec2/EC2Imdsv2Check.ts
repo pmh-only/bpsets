@@ -3,7 +3,7 @@ import {
   EC2Client,
   ModifyInstanceMetadataOptionsCommand
 } from '@aws-sdk/client-ec2'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class EC2Imdsv2Check implements BPSet {

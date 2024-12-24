@@ -4,7 +4,7 @@ import {
   CreateFileSystemCommand,
   DeleteFileSystemCommand
 } from '@aws-sdk/client-efs'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class EFSEncryptedCheck implements BPSet {

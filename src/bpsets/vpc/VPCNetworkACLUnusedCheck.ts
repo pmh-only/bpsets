@@ -3,7 +3,7 @@ import {
   DescribeNetworkAclsCommand,
   DeleteNetworkAclCommand
 } from '@aws-sdk/client-ec2'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class VPCNetworkACLUnusedCheck implements BPSet {

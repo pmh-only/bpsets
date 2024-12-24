@@ -7,7 +7,7 @@ import {
   BackupClient,
   ListRecoveryPointsByResourceCommand
 } from '@aws-sdk/client-backup'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class AuroraLastBackupRecoveryPointCreated implements BPSet {

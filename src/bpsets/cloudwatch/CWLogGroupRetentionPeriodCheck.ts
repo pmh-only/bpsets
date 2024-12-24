@@ -3,7 +3,7 @@ import {
   DescribeLogGroupsCommand,
   PutRetentionPolicyCommand
 } from '@aws-sdk/client-cloudwatch-logs'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class CWLogGroupRetentionPeriodCheck implements BPSet {

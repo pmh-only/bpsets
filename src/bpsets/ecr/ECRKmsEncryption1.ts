@@ -7,7 +7,7 @@ import {
   PutImageCommand,
   DeleteRepositoryCommand
 } from '@aws-sdk/client-ecr'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ECRKmsEncryption1 implements BPSet {

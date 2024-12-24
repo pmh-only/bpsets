@@ -3,7 +3,7 @@ import {
   ListSecretsCommand,
   RotateSecretCommand
 } from '@aws-sdk/client-secrets-manager'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class SecretsManagerSecretPeriodicRotation implements BPSet {

@@ -1,5 +1,5 @@
 import { AutoScalingClient, DescribeAutoScalingGroupsCommand, UpdateAutoScalingGroupCommand } from '@aws-sdk/client-auto-scaling'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class AutoScalingGroupELBHealthCheckRequired implements BPSet {

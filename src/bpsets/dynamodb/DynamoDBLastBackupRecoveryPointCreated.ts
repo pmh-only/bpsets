@@ -8,7 +8,7 @@ import {
   ListRecoveryPointsByResourceCommand,
   StartBackupJobCommand
 } from '@aws-sdk/client-backup'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class DynamoDBLastBackupRecoveryPointCreated implements BPSet {

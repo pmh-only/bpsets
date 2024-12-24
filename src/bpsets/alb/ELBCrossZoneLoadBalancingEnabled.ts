@@ -4,7 +4,7 @@ import {
   DescribeLoadBalancerAttributesCommand,
   ModifyLoadBalancerAttributesCommand
 } from '@aws-sdk/client-elastic-load-balancing-v2'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ELBCrossZoneLoadBalancingEnabled implements BPSet {

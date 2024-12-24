@@ -5,7 +5,7 @@ import {
   DescribeContinuousBackupsCommand,
   UpdateContinuousBackupsCommand
 } from '@aws-sdk/client-dynamodb'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class DynamoDBPITREnabled implements BPSet {

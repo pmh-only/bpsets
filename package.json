@@ -1,10 +1,11 @@
 {
   "name": "bpsets",
   "version": "0.1.0",
-  "main": "build/main.js",
+  "main": "dist/main.js",
   "scripts": {
-    "build": "./build.sh",
-    "start": "./build.sh && ./dist/bpsets"
+    "build": "tsc",
+    "start": "node .",
+    "dev": "nodemon -e ts --exec \"tsc && node . || exit 1\""
   },
   "author": "Minhyeok Park<pmh_only@pmh.codes>",
   "license": "MIT",
@@ -45,7 +46,7 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
     "@types/sha.js": "^2.4.4",
-    "esbuild": "^0.24.2",
+    "nodemon": "^3.1.9",
     "typescript": "^5.7.2"
   }
 }

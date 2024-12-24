@@ -5,7 +5,7 @@ import {
   CreateAccessPointCommand
 } from '@aws-sdk/client-s3-control'
 import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class S3AccessPointInVpcOnly implements BPSet {

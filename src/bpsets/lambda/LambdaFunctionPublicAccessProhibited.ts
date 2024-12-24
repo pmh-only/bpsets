@@ -4,7 +4,7 @@ import {
   GetPolicyCommand,
   RemovePermissionCommand
 } from '@aws-sdk/client-lambda'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class LambdaFunctionPublicAccessProhibited implements BPSet {

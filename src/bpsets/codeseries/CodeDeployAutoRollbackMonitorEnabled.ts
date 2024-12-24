@@ -5,7 +5,7 @@ import {
   BatchGetDeploymentGroupsCommand,
   UpdateDeploymentGroupCommand
 } from '@aws-sdk/client-codedeploy'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class CodeDeployAutoRollbackMonitorEnabled implements BPSet {

@@ -3,7 +3,7 @@ import {
   DescribeDBClustersCommand,
   ModifyDBClusterCommand
 } from '@aws-sdk/client-rds'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class RDSClusterDeletionProtectionEnabled implements BPSet {

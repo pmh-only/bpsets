@@ -3,7 +3,7 @@ import {
   DescribeClustersCommand,
   UpdateClusterSettingsCommand
 } from '@aws-sdk/client-ecs'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ECSContainerInsightsEnabled implements BPSet {

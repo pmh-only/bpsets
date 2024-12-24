@@ -4,7 +4,7 @@ import {
   GetWebACLCommand,
   UpdateWebACLCommand
 } from '@aws-sdk/client-wafv2';
-import { BPSet } from '../BPSet';
+import { BPSet } from '../../types';
 import { Memorizer } from '../../Memorizer';
 
 export class WAFv2WebACLNotEmpty implements BPSet {

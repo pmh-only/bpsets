@@ -3,7 +3,7 @@ import {
   DescribeInstancesCommand
 } from '@aws-sdk/client-ec2'
 import { SSMClient, DescribeInstanceInformationCommand } from '@aws-sdk/client-ssm'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class EC2InstanceManagedBySystemsManager implements BPSet {

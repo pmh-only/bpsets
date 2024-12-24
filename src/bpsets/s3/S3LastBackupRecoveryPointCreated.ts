@@ -3,7 +3,7 @@ import {
   ListBucketsCommand
 } from '@aws-sdk/client-s3'
 import { BackupClient, ListRecoveryPointsByResourceCommand } from '@aws-sdk/client-backup'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class S3LastBackupRecoveryPointCreated implements BPSet {

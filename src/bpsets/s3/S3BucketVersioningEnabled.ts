@@ -4,7 +4,7 @@ import {
   GetBucketVersioningCommand,
   PutBucketVersioningCommand
 } from '@aws-sdk/client-s3'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class S3BucketVersioningEnabled implements BPSet {

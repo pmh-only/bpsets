@@ -4,7 +4,7 @@ import {
   DescribeMountTargetsCommand
 } from '@aws-sdk/client-efs'
 import { EC2Client, DescribeRouteTablesCommand } from '@aws-sdk/client-ec2'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class EFSMountTargetPublicAccessible implements BPSet {

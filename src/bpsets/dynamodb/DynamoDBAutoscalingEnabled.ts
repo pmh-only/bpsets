@@ -9,7 +9,7 @@ import {
   PutScalingPolicyCommand,
   DescribeScalingPoliciesCommand
 } from '@aws-sdk/client-application-auto-scaling'
-import { BPSet } from '../BPSet'
+import { BPSet } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class DynamoDBAutoscalingEnabled implements BPSet {
