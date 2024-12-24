@@ -1,6 +1,17 @@
 import { Client } from '@smithy/smithy-client'
 import shajs from 'sha.js'
 
+/**
+ * Memorize AWS SDK operation results.
+ * This util class tend to be always re-use AWS SDK Client
+ * which makes operation more faster and optimize memory usage.
+ * 
+ * All results will be store as Key-Value hash map.
+ * * Key: sha256(serialize([OPERATION_NAME, OPERATION_INPUT_PARAMETER]))
+ * * Value: OPERATION_OUTPUT
+ * 
+ * @author Minhyeok Park <pmh_only@pmh.codes>
+ */
 export class Memorizer {
   private static memorized = new Map<string, Memorizer>()
 
