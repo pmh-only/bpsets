@@ -26,7 +26,7 @@ export class S3LastBackupRecoveryPointCreated implements BPSet {
     const buckets = await this.getBuckets()
 
     for (const bucket of buckets) {
-      const recoveryPoints = await this.memoClient.send(
+      const recoveryPoints = await this.backupClient.send(
         new ListRecoveryPointsByResourceCommand({
           ResourceArn: `arn:aws:s3:::${bucket.Name!}`
         })

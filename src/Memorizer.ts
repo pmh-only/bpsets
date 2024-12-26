@@ -15,14 +15,17 @@ import shajs from 'sha.js'
 export class Memorizer {
   private static memorized = new Map<string, Memorizer>()
 
-  public static memo (client: Client<any, any, any, any>) {
-    const memorized = this.memorized.get(client.constructor.name)
+  public static memo (client: Client<any, any, any, any>, salt = '') {
+    const serialized = JSON.stringify([client.constructor.name, salt])
+    const hashed = shajs('sha256').update(serialized).digest('hex')
+
+    const memorized = this.memorized.get(hashed)
 
     if (memorized !== undefined)
       return memorized
 
     const newMemo = new Memorizer(client)
-    this.memorized.set(client.constructor.name, newMemo)
+    this.memorized.set(hashed, newMemo)
 
     return newMemo
   }

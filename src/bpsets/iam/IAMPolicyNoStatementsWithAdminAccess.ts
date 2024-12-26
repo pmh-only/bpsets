@@ -38,9 +38,9 @@ export class IAMPolicyNoStatementsWithAdminAccess implements BPSet {
 
       for (const statement of statements) {
         if (
-          statement.Action === '*' &&
-          statement.Resource === '*' &&
-          statement.Effect === 'Allow'
+          statement?.Action === '*' &&
+          statement?.Resource === '*' &&
+          statement?.Effect === 'Allow'
         ) {
           nonCompliantResources.push(policy.Arn!)
           break

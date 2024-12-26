@@ -11,7 +11,7 @@ export class WAFv2RuleGroupNotEmpty implements BPSet {
   private readonly regionalClient = new WAFV2Client({});
   private readonly globalClient = new WAFV2Client({ region: 'us-east-1' });
   private readonly memoRegionalClient = Memorizer.memo(this.regionalClient);
-  private readonly memoGlobalClient = Memorizer.memo(this.globalClient);
+  private readonly memoGlobalClient = Memorizer.memo(this.globalClient, 'global');
 
   private readonly getRuleGroups = async (scope: 'REGIONAL' | 'CLOUDFRONT') => {
     const client = scope === 'REGIONAL' ? this.memoRegionalClient : this.memoGlobalClient;
