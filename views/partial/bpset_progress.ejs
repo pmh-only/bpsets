@@ -1,0 +1,57 @@
+<%
+  const passResources = metadata.compliantResources.length
+  const failResources = metadata.nonCompliantResources.length
+
+  const totalResources = passResources + failResources
+  const passPercent =
+    totalResources > 0
+      ? passResources / totalResources * 100
+      : 100
+
+  const isPass = failResources < 1
+%>
+
+<% if (metadata.status === 'FINISHED') { %>
+  <td>
+    <span class="badge text-bg-<%= isPass ? 'success' : 'danger' %>">
+      <%= isPass ? 'Pass' : 'Fail' %>
+    </span>
+  </td>
+
+  <td>
+    <div class="progress" role="progressbar">
+      <div class="progress-bar" style="width: <%= passPercent %>%"></div>
+    </div>
+    (<%= passResources %>/<%= totalResources %>)
+  </td>
+<% } %>
+
+<% if (metadata.status === 'CHECKING') { %>
+  <td colspan="2">
+    <div class="progress" role="progressbar">
+      <div class="progress-bar progress-bar-striped progress-bar-animated bg-secondary" style="width: 100%"></div>
+    </div>
+
+    <p>Progressing</p>
+  </td>
+<% } %>
+
+<% if (metadata.status === 'ERROR') { %>
+  <td colspan="2">
+    <div class="progress" role="progressbar">
+      <div class="progress-bar progress-bar-striped bg-danger" style="width: 100%"></div>
+    </div>
+
+    <p>Error</p>
+  </td>
+<% } %>
+
+<% if (metadata.status === 'LOADED') { %>
+  <td colspan="2">
+    <div class="progress" role="progressbar">
+      <div class="progress-bar" style="width: 0%"></div>
+    </div>
+
+    <p>Ready</p>
+  </td>
+<% } %>

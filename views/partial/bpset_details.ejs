@@ -1,0 +1,59 @@
+<%
+  const priorityLabel = ['CRITICAL', 'Required', 'Recommend'][metadata.priority-1] || 'Recommend'
+  const priorityColor = ['danger', 'warning', 'secondary'][metadata.priority-1] || 'secondary'
+%>
+
+<tr>
+  <td colspan="7" class="p-0">
+    <div class="collapse" id="detail-<%= metadata.idx %>">
+      <div class="bg-light p-3">
+        <h3><%= metadata.name %></h3>
+        <p><%= metadata.description %></p>
+
+        <p>
+          Category:
+          <span class="badge text-bg-secondary"><%= metadata.bestPracticeCategory %></span>
+          <%= metadata.awsServiceCategory %> - <%= metadata.awsService %>
+        </p>
+
+        <p>
+          Priority:
+          <span class="badge text-bg-<%= priorityColor %>">
+            <%= metadata.priority %> - <%= priorityLabel %>
+          </span>
+
+          <%= metadata.priorityReason %>
+        </p>
+
+        <h4>Operations used in check function</h4>
+        <div class="row row-cols-3">
+          <% metadata.commandUsedInCheckFunction.forEach(({ name, reason }) => { %>
+            <div class="col">
+              <div class="card">
+                <h5 class="card-header"><%= name %></h5>
+                <div class="card-body">
+                  <%= reason %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+        <br>
+        
+        <h4>Operations used in fix function</h4>
+        <div class="row row-cols-3">
+          <% metadata.commandUsedInFixFunction.forEach(({ name, reason }) => { %>
+            <div class="col">
+              <div class="card">
+                <h5 class="card-header"><%= name %></h5>
+                <div class="card-body">
+                  <%= reason %>
+                </div>
+              </div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+  </td>
+</tr>

@@ -51,4 +51,8 @@ export interface BPSetMetadata {
   compliantResources: string[]
   status: 'LOADED' | 'CHECKING' | 'ERROR' | 'FINISHED'
   idx: number
+  errorMessage: {
+    date: Date,
+    message: string
+  }[]
 }

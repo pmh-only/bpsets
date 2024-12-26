@@ -15,6 +15,7 @@ export class WebServer {
     this.app.use(express.static('./public'))
     
     this.app.get('/', this.getMainPage.bind(this))
+    this.app.get('/check_all', this.runCheck.bind(this))
     this.app.use(this.error404)
     
     this.app.listen(this.port, this.showBanner.bind(this))
@@ -39,6 +40,12 @@ export class WebServer {
       bpStatus,
       bpLength: bpMetadatas.length
     })
+  }
+
+  
+  private runCheck(_: Request, res: Response) {
+    void this.bpManager.runCheck()
+    res.redirect('/')
   }
 
   private error404 (_: Request, res: Response) {

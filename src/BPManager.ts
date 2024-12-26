@@ -11,7 +11,7 @@ export class BPManager {
   // ---
 
   private readonly bpSets:
-    Record<string, BPSet | undefined> = {}   
+    Record<string, BPSet> = {}   
 
   private readonly bpSetMetadatas:
     Record<string, BPSetMetadata> = {}
@@ -32,10 +32,10 @@ export class BPManager {
         continue
       
       const bpSetPath = path.join(bpSetFile.parentPath, bpSetFile.name)
-      const bpSetClasses = await import('../' + bpSetPath) as Record<string, BPSet>
+      const bpSetClasses = await import('../' + bpSetPath) as Record<string, new () => BPSet>
 
       for (const bpSetClass of Object.keys(bpSetClasses))
-        this.bpSets[bpSetClass] = bpSetClasses[bpSetClass]
+        this.bpSets[bpSetClass] = new bpSetClasses[bpSetClass]()
     }
   }
 
@@ -49,8 +49,33 @@ export class BPManager {
         nonCompliantResources: [],
         compliantResources: [],
         status:'LOADED',
+        errorMessage: [],
         idx
       }
+    }
+  }
+
+  public async runCheck() {
+    for (const name in this.bpSets) {
+      this.bpSetMetadatas[name].status = 'CHECKING'
+
+      const result = await this.bpSets[name].check()
+        .catch((err) => {
+          this.bpSetMetadatas[name].status = 'ERROR'
+          this.bpSetMetadatas[name].errorMessage.push({
+            date: new Date(),
+            message: err
+          })
+
+          return undefined
+        })
+
+      if (result === undefined)
+        continue
+
+      this.bpSetMetadatas[name].compliantResources = result.compliantResources
+      this.bpSetMetadatas[name].nonCompliantResources = result.nonCompliantResources
+      this.bpSetMetadatas[name].status = 'FINISHED'
     }
   }
 

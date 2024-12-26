@@ -1,0 +1,19 @@
+<%
+  const priorityLabel = ['CRITICAL', 'Required', 'Recommend'][metadata.priority-1] || 'Recommend'
+  const priorityColor = ['danger', 'warning', 'secondary'][metadata.priority-1] || 'secondary'
+%>
+
+<tr>
+  <td class="fw-bold">#<%= metadata.idx + 1 %></td>
+  <td><%= metadata.name %></td>
+  <td><%= metadata.bestPracticeCategory %></td>
+  
+  <td>
+    <span class="badge text-bg-<%= priorityColor %>">
+      <%= metadata.priority %> - <%= priorityLabel %>
+    </span>
+  </td>
+
+  <%- include('./bpset_progress.ejs', { metadata }) %>
+  <%- include('./bpset_actions.ejs', { metadata }) %>
+</tr>

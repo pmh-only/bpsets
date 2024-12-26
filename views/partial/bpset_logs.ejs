@@ -1,0 +1,34 @@
+<tr>
+  <td colspan="7" class="p-0">
+    <div class="collapse" id="logs-<%= metadata.idx %>">
+      <div class="bg-light p-3">
+        <h4>Non-Compliant Resources</h4>
+        <ul>
+          <% metadata.nonCompliantResources.forEach((id) => { %>
+            <li><%= id %></li>
+          <% }) %>
+        </ul>
+
+        <br>
+
+        <h4>Compliant Resources</h4>
+        <ul>
+          <% metadata.compliantResources.forEach((id) => { %>
+            <li><%= id %></li>
+          <% }) %>
+        </ul>
+        <br>
+
+        <h4>Error Logs</h4>
+        <ul>
+          <% metadata.errorMessage.forEach((log) => { %>
+            <li>
+              <p><%= log.date %></p>
+              <pre><%= log.message %></pre>
+            </li>
+          <% }) %>
+        </ul>
+      </div>
+    </div>
+  </td>
+</tr>
