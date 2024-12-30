@@ -15,7 +15,7 @@ import shajs from 'sha.js'
 export class Memorizer {
   private static memorized = new Map<string, Memorizer>()
 
-  public static memo (client: Client<any, any, any, any>, salt = '') {
+  public static memo(client: Client<any, any, any, any>, salt = '') {
     const serialized = JSON.stringify([client.constructor.name, salt])
     const hashed = shajs('sha256').update(serialized).digest('hex')
 
@@ -28,6 +28,11 @@ export class Memorizer {
     this.memorized.set(hashed, newMemo)
 
     return newMemo
+  }
+
+  public static reset() {
+    for (const memorized of Memorizer.memorized.values())
+      memorized.reset()
   }
 
   private memorized = new Map<string, any>()
@@ -44,9 +49,14 @@ export class Memorizer {
     if (memorized !== undefined)
       return memorized
 
+    console.log(command.constructor.name, 'Executed.')
+
     const newMemo = await this.client.send(command)
     this.memorized.set(hashed, newMemo)
 
     return newMemo
   }
+
+  private readonly reset = () =>
+    this.memorized.clear()
 }

@@ -1,67 +1,67 @@
-import {
-  IAMClient,
-  ListPoliciesCommand,
-  GetPolicyVersionCommand,
-  DeletePolicyCommand
-} from '@aws-sdk/client-iam'
-import { BPSet } from '../../types'
-import { Memorizer } from '../../Memorizer'
+import { IAMClient, ListPoliciesCommand, GetPolicyVersionCommand } from "@aws-sdk/client-iam";
+import { BPSet } from "../../types";
+import { Memorizer } from "../../Memorizer";
 
-export class IAMPolicyNoStatementsWithAdminAccess implements BPSet {
-  private readonly client = new IAMClient({})
-  private readonly memoClient = Memorizer.memo(this.client)
-
-  private readonly getPolicies = async () => {
-    const response = await this.memoClient.send(new ListPoliciesCommand({ Scope: 'Local' }))
-    return response.Policies || []
-  }
-
-  private readonly getPolicyDefaultVersions = async (policyArn: string, versionId: string) => {
-    const response = await this.memoClient.send(
-      new GetPolicyVersionCommand({ PolicyArn: policyArn, VersionId: versionId })
-    )
-    return response.PolicyVersion!
-  }
+export class IAMPolicyNoStatementsWithFullAccess implements BPSet {
+  private readonly client = new IAMClient({});
+  private readonly memoClient = Memorizer.memo(this.client);
 
   public readonly check = async () => {
-    const compliantResources = []
-    const nonCompliantResources = []
-    const policies = await this.getPolicies()
+    const compliantResources: string[] = [];
+    const nonCompliantResources: string[] = [];
+
+    // Fetch all customer-managed IAM policies
+    const policiesResponse = await this.memoClient.send(
+      new ListPoliciesCommand({ Scope: "Local" })
+    );
+    const policies = policiesResponse.Policies || [];
 
     for (const policy of policies) {
-      const policyVersion = await this.getPolicyDefaultVersions(policy.Arn!, policy.DefaultVersionId!)
+      // Get the default version of the policy
+      const policyVersionResponse = await this.memoClient.send(
+        new GetPolicyVersionCommand({
+          PolicyArn: policy.Arn!,
+          VersionId: policy.DefaultVersionId!,
+        })
+      );
 
-      const policyDocument = JSON.parse(JSON.stringify(policyVersion.Document)) // Parse Document JSON string
-      const statements = Array.isArray(policyDocument.Statement)
-        ? policyDocument.Statement
-        : [policyDocument.Statement]
+      const policyDocument = JSON.parse(
+        decodeURIComponent(policyVersionResponse.PolicyVersion!.Document as string)
+      );
 
-      for (const statement of statements) {
-        if (
-          statement.Action === '*' &&
-          statement.Resource === '*' &&
-          statement.Effect === 'Allow'
-        ) {
-          nonCompliantResources.push(policy.Arn!)
-          break
-        }
-      }
+      // Check statements for full access
+      const hasFullAccess = policyDocument.Statement.some((statement: any) => {
+        if (statement.Effect === "Deny") return false;
+        const actions = Array.isArray(statement.Action)
+          ? statement.Action
+          : [statement.Action];
+        return actions.some((action: string) => action.endsWith(":*"));
+      });
 
-      if (!nonCompliantResources.includes(policy.Arn!)) {
-        compliantResources.push(policy.Arn!)
+      if (hasFullAccess) {
+        nonCompliantResources.push(policy.Arn!);
+      } else {
+        compliantResources.push(policy.Arn!);
       }
     }
 
     return {
       compliantResources,
       nonCompliantResources,
-      requiredParametersForFix: []
-    }
-  }
+      requiredParametersForFix: [],
+    };
+  };
 
-  public readonly fix = async (nonCompliantResources: string[]) => {
-    for (const arn of nonCompliantResources) {
-      await this.client.send(new DeletePolicyCommand({ PolicyArn: arn }))
+  public readonly fix = async (
+    nonCompliantResources: string[],
+    requiredParametersForFix: { name: string; value: string }[]
+  ) => {
+    for (const policyArn of nonCompliantResources) {
+      // Add logic to remove or modify the statements with full access
+      // Note: Updating an IAM policy requires creating a new version and setting it as default
+      console.error(
+        `Fix operation is not implemented for policy ${policyArn}. Manual intervention is required.`
+      );
     }
-  }
+  };
 }

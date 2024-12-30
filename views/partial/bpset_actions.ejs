@@ -1,7 +1,7 @@
 <td>
   <div class="btn-group">
-    <button type="button" class="btn btn-primary">Fix</button>
-    <button type="button" class="btn btn-secondary">Recheck</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#fixdialog-<%= metadata.idx %>">Fix</button>
+    <a href="/check?name=<%= metadata.name %>&hidePass=<% hidePass %>" type="button" class="btn btn-secondary">Recheck</a>
     <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#detail-<%= metadata.idx %>">Details</button>
     <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#logs-<%= metadata.idx %>">Logs</button>
   </div>

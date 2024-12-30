@@ -1,23 +1,42 @@
+<%
+  const metadatas =
+    bpStatus
+      .map(({ metadatas }) => metadatas)
+      .flat()
+      .filter((v) => v.status === 'FINISHED')
+
+  const passCount = metadatas.filter((v) => v.nonCompliantResources.length < 1).length
+  const failCount = metadatas.filter((v) => v.nonCompliantResources.length > 0).length
+  const errorCount = metadatas.filter((v) => v.status === 'ERROR').length
+%>
+
 <div class="d-flex justify-content-between align-items-end">
   <div>
     <h1 class="fw-bold">BPSets (<%= bpLength %>)</h1>
     <p>Created by Minhyeok Park</p>
   </div>
 
-  <div class="d-flex">
+  <div class="d-flex status gap-3 text-center">
     <div>
-      <p>Pass</p>
-      <p><%=  %></p>
+      <p class="m-0">Pass</p>
+      <p class="fs-3"><%= passCount %></p>
     </div>
     <div>
-      <p>Fail</p>
+      <p class="m-0">Fail</p>
+      <p class="fs-3"><%= failCount %></p>
     </div>
     <div>
-      <p>Error</p>
+      <p class="m-0">Error</p>
+      <p class="fs-3"><%= errorCount %></p>
     </div>
   </div>
 
   <div class="btn-group">
-    <a href="/check_all" type="button" class="btn btn-primary">Check All</a>
+    <a href="/check_all?hidePass=<% hidePass %>" type="button" class="btn btn-primary">Check All</a>
+    <% if (hidePass) { %>
+      <a href="/?hidePass=false" type="button" class="btn btn-secondary">Show Pass</a>
+    <% } else { %>
+      <a href="/?hidePass=true" type="button" class="btn btn-secondary">Hide Pass</a>
+    <% } %>
   </div>
 </div>

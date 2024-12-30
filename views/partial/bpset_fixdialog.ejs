@@ -1,0 +1,48 @@
+<div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="fixdialog-<%= metadata.idx %>">
+  <div class="offcanvas-header d-flex gap-3">
+    <h3 class="offcanvas-title" style="word-break: break-all;">Fixing <%= metadata.name %></h3>
+  </div>
+  
+  <div class="offcanvas-body">
+    <h3 class="mb-3">Pending operations</h3>
+    <% metadata.commandUsedInFixFunction.forEach(({ name, reason }) => { %>
+      <div class="card mb-3">
+        <h5 class="card-header"><%= name %></h5>
+        <div class="card-body">
+          <%= reason %>
+        </div>
+      </div>
+    <% }) %>
+
+    <br>
+
+    <h3 class="mb-3">Required Parameters</h3>
+    <form method="POST" action="/fix?name=<%= metadata.name %>&hidePass=<%= hidePass %>">
+      <% metadata.requiredParametersForFix.forEach((input) => { %>
+        <div class="mb-3">
+          <label for="<%= `${metadata.name}-${input.name}` %>" class="form-label"><%= input.name %></label>
+          <input type="text" class="form-control" name="<%= input.name %>" id="<%= `${metadata.name}-${input.name}` %>" value="<%= input.default %>" required>
+          <div class="form-text">
+            <%= input.description %><br />
+            ex) <code><%= input.example %></code>
+          </div>
+        </div>
+      <% }) %>
+      <br>
+      
+      <% if (metadata.isFixFunctionUsesDestructiveCommand) { %>
+        <div class="alert alert-danger" role="alert">
+          This Fix Function Has DESTRUCTIVE Command! please review pending operations carefully!
+        </div>
+      <% } %>
+
+      <div class="alert alert-warning" role="alert">
+        <%= metadata.adviseBeforeFixFunction %>
+      </div>
+
+      <br>
+
+      <button class="btn btn-primary" type="submit">Fix!</button>
+    </form>
+  </div>
+</div>

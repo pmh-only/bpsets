@@ -55,28 +55,67 @@ export class BPManager {
     }
   }
 
-  public async runCheck() {
-    for (const name in this.bpSets) {
-      this.bpSetMetadatas[name].status = 'CHECKING'
-
-      const result = await this.bpSets[name].check()
-        .catch((err) => {
-          this.bpSetMetadatas[name].status = 'ERROR'
-          this.bpSetMetadatas[name].errorMessage.push({
-            date: new Date(),
-            message: err
-          })
-
-          return undefined
+  public runCheckOnce(name: string) {
+    return this
+      .bpSets[name].check()
+      .catch((err) => {
+        this.bpSetMetadatas[name].status = 'ERROR'
+        this.bpSetMetadatas[name].errorMessage.push({
+          date: new Date(),
+          message: err
         })
 
-      if (result === undefined)
-        continue
+        return undefined
+      })
+      .then((result) => {
+        if (result === undefined)
+          return
 
-      this.bpSetMetadatas[name].compliantResources = result.compliantResources
-      this.bpSetMetadatas[name].nonCompliantResources = result.nonCompliantResources
-      this.bpSetMetadatas[name].status = 'FINISHED'
-    }
+        this.bpSetMetadatas[name].compliantResources = result.compliantResources
+        this.bpSetMetadatas[name].nonCompliantResources = result.nonCompliantResources
+        this.bpSetMetadatas[name].status = 'FINISHED'
+      })
+  }
+
+  public runCheckAll(finished = (name: string) => {}) {
+    const checkJobs =
+      Object
+        .values(this.bpSetMetadatas)
+        .map(({ name }) => {
+          this.bpSetMetadatas[name].status = 'CHECKING'
+
+          return this
+            .bpSets[name].check()
+            .catch((err) => {
+              this.bpSetMetadatas[name].status = 'ERROR'
+              this.bpSetMetadatas[name].errorMessage.push({
+                date: new Date(),
+                message: err
+              })
+    
+              return undefined
+            })
+            .then((result) => {
+              if (result === undefined)
+                return
+    
+              this.bpSetMetadatas[name].compliantResources = result.compliantResources
+              this.bpSetMetadatas[name].nonCompliantResources = result.nonCompliantResources
+              this.bpSetMetadatas[name].status = 'FINISHED'
+              finished(name)
+            })
+        })
+    
+    return Promise.all(checkJobs)
+  }
+
+  public runFix(name: string, requiredParametersForFix: { name: string, value: string }[]) {
+    return this
+      .bpSets[name]
+      .fix(
+        this.bpSetMetadatas[name].nonCompliantResources,
+        requiredParametersForFix
+      )
   }
 
   public readonly getBPSet = (name: string) =>
