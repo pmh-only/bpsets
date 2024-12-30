@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import { BPManager } from './BPManager'
 import { BPSetMetadata } from './types'
 import { Memorizer } from './Memorizer'
+import path from 'path'
 
 export class WebServer {  
   private readonly app = express()
@@ -12,7 +13,7 @@ export class WebServer {
     private readonly port = 2424
   ) {
     this.app.set('view engine', 'ejs')
-    this.app.set('views', './views');
+    this.app.set('views', path.join(__dirname, '../views'));
     
     this.app.get('/', this.getMainPage.bind(this))
     this.app.get('/check', this.runCheckOnce.bind(this))

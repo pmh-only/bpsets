@@ -1,11 +1,13 @@
 {
   "name": "bpsets",
   "version": "0.1.0",
-  "main": "dist/main.js",
+  "main": "build/main.js",
+  "bin": "build/main.js",
   "scripts": {
-    "build": "rimraf ./dist && tsc",
+    "pkg": "rimraf ./build && tsc && pkg .",
+    "build": "rimraf ./build && tsc",
     "start": "node .",
-    "dev": "nodemon -e ts --exec \"rimraf ./dist && tsc && node . || exit 1\""
+    "dev": "nodemon -e ts --exec \"rimraf ./build && tsc && node . || exit 1\""
   },
   "author": "Minhyeok Park<pmh_only@pmh.codes>",
   "license": "MIT",
@@ -48,7 +50,20 @@
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.2",
     "@types/sha.js": "^2.4.4",
+    "@yao-pkg/pkg": "^6.2.0",
     "nodemon": "^3.1.9",
     "typescript": "^5.7.2"
+  },
+  "pkg": {
+    "scripts": "build/**/*",
+    "assets": [
+      "views/**/*",
+      "bpset_metadata.json"
+    ],
+    "targets": [
+      "node22-linuxstatic-x86_64",
+      "node22-linuxstatic-arm64"
+    ],
+    "outputPath": "dist"
   }
 }

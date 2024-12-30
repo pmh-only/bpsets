@@ -22,25 +22,25 @@ export class BPManager {
   }
 
   private async loadBPSets() {
-    const bpSetFiles = await readdir('./dist/bpsets', {
-      recursive: true,
-      withFileTypes: true
-    })
+    const bpSetFolders = await readdir(path.join(__dirname, 'bpsets'))
+    
+    for (const bpSetFolder of bpSetFolders) {
+      const bpSetFiles = await readdir(path.join(__dirname, 'bpsets', bpSetFolder))
 
-    for (const bpSetFile of bpSetFiles) {
-      if (bpSetFile.isDirectory())
-        continue
-      
-      const bpSetPath = path.join(bpSetFile.parentPath, bpSetFile.name)
-      const bpSetClasses = await import('../' + bpSetPath) as Record<string, new () => BPSet>
-
-      for (const bpSetClass of Object.keys(bpSetClasses))
-        this.bpSets[bpSetClass] = new bpSetClasses[bpSetClass]()
+      for (const bpSetFile of bpSetFiles) {
+        const bpSetPath = path.join(__dirname, 'bpsets', bpSetFolder, bpSetFile)
+        const bpSetClasses = await import(bpSetPath) as Record<string, new () => BPSet>
+  
+        for (const bpSetClass of Object.keys(bpSetClasses)) {
+          this.bpSets[bpSetClass] = new bpSetClasses[bpSetClass]()
+          console.log('BPSet implement,', bpSetClass, 'loaded')
+        }
+      }
     }
   }
 
   private async loadBPSetMetadatas() {
-    const bpSetMetadatasRaw = await readFile('./bpset_metadata.json')
+    const bpSetMetadatasRaw = await readFile(path.join(__dirname, '../bpset_metadata.json'))
     const bpSetMetadatas = JSON.parse(bpSetMetadatasRaw.toString('utf-8')) as BPSetMetadata[]
 
     for (const [idx, bpSetMetadata] of bpSetMetadatas.entries()) {

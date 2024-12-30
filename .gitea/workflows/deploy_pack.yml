@@ -1,0 +1,14 @@
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  deploy_site:
+    runs-on: ubuntu-latest
+    container: 
+      image: src.pmh.codes/build-tools/react2minio:latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pnpm i
+      - run: pnpm run pkg
+      - run: mc cp $PWD/dist/* minio/releases/

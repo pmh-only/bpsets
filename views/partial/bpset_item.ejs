@@ -5,11 +5,23 @@
 
 <tr>
   <td class="fw-bold">#<%= metadata.idx + 1 %></td>
-  <td><%= metadata.name %></td>
+  <td>
+    <span
+      class="m-0"
+      data-bs-toggle="tooltip"
+      data-bs-placement="bottom"
+      data-bs-title="<%= metadata.description %>">
+      <%= metadata.name %>
+    </span>
+  </td>
   <td><%= metadata.bestPracticeCategory %></td>
   
   <td>
-    <span class="badge text-bg-<%= priorityColor %>">
+    <span
+      class="badge text-bg-<%= priorityColor %>"
+      data-bs-toggle="tooltip"
+      data-bs-placement="bottom"
+      data-bs-title="<%= metadata.priorityReason %>">
       <%= metadata.priority %> - <%= priorityLabel %>
     </span>
   </td>
