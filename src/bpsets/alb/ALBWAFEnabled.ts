@@ -1,6 +1,6 @@
 import { ElasticLoadBalancingV2Client, DescribeLoadBalancersCommand } from '@aws-sdk/client-elastic-load-balancing-v2'
 import { WAFV2Client, GetWebACLForResourceCommand, AssociateWebACLCommand } from '@aws-sdk/client-wafv2'
-import { BPSet } from '../../types'
+import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class ALBWAFEnabled implements BPSet {
@@ -13,11 +13,73 @@ export class ALBWAFEnabled implements BPSet {
     return response.LoadBalancers || []
   }
 
-  public readonly check = async (): Promise<{
-    compliantResources: string[]
-    nonCompliantResources: string[]
-    requiredParametersForFix: { name: string }[]
-  }> => {
+  public readonly getMetadata = () => (
+    {
+      name: 'ALBWAFEnabled',
+      description: 'Ensures that WAF is associated with ALBs.',
+      priority: 1,
+      priorityReason: 'Associating WAF with ALBs protects against common web attacks.',
+      awsService: 'Elastic Load Balancing',
+      awsServiceCategory: 'Application Load Balancer',
+      bestPracticeCategory: 'Security',
+      requiredParametersForFix: [
+        {
+          name: 'web-acl-arn',
+          description: 'The ARN of the WAF ACL to associate with the ALB.',
+          default: '',
+          example: 'arn:aws:wafv2:us-east-1:123456789012:regional/webacl/example'
+        }
+      ],
+      isFixFunctionUsesDestructiveCommand: false,
+      commandUsedInCheckFunction: [
+        {
+          name: 'GetWebAclForResourceCommand',
+          reason: 'Check if a WAF is associated with the ALB.'
+        }
+      ],
+      commandUsedInFixFunction: [
+        {
+          name: 'AssociateWebAclCommand',
+          reason: 'Associate a WAF ACL with the ALB.'
+        }
+      ],
+      adviseBeforeFixFunction: 'Ensure the WAF ACL has the appropriate rules for the application\'s requirements.'
+  })
+
+  private readonly stats: BPSetStats = {
+    nonCompliantResources: [],
+    compliantResources: [],
+    status: 'LOADED',
+    errorMessage: []
+  }
+
+  public readonly getStats = () =>
+    this.stats
+
+  public readonly clearStats = () => {
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
+  
+  public readonly check = async () => {
+    this.stats.status = 'CHECKING'
+    
+    await this.checkImpl()
+      .then(
+        () => this.stats.status = 'FINISHED',
+        (err) => {
+          this.stats.status = 'ERROR'
+          this.stats.errorMessage.push({
+            date: new Date(),
+            message: err
+          }
+        )
+      })
+  }
+
+  private readonly checkImpl = async () => {
     const compliantResources: string[] = []
     const nonCompliantResources: string[] = []
     const loadBalancers = await this.getLoadBalancers()
@@ -33,17 +95,27 @@ export class ALBWAFEnabled implements BPSet {
       }
     }
 
-    return {
-      compliantResources,
-      nonCompliantResources,
-      requiredParametersForFix: [{ name: 'web-acl-arn' }]
-    }
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+    this.stats.status = 'FINISHED'
   }
 
-  public readonly fix = async (
-    nonCompliantResources: string[],
-    requiredParametersForFix: { name: string; value: string }[]
-  ): Promise<void> => {
+  
+  public readonly fix: BPSetFixFn = async (...args) => {
+    await this.fixImpl(...args)
+      .then(
+        () => this.stats.status = 'FINISHED',
+        (err) => {
+          this.stats.status = 'ERROR'
+          this.stats.errorMessage.push({
+            date: new Date(),
+            message: err
+          }
+        )
+      })
+  }
+
+  public readonly fixImpl: BPSetFixFn = async (nonCompliantResources, requiredParametersForFix) => {
     const webAclArn = requiredParametersForFix.find(param => param.name === 'web-acl-arn')?.value
 
     if (!webAclArn) {

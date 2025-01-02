@@ -7,21 +7,20 @@
  * @author Minhyeok Park <pmh_only@pmh.codes>
  */
 export interface BPSet {
-  check: () => Promise<{
-    compliantResources: string[]
-    nonCompliantResources: string[]
-    requiredParametersForFix: {
-      name: string
-    }[]
-  }>,
-  fix: (
-    nonCompliantResources: string[],
-    requiredParametersForFix: {
-      name: string,
-      value: string
-    }[]
-  ) => Promise<void>
+  getMetadata: () => BPSetMetadata
+  getStats: () => BPSetStats
+  clearStats: () => void
+  check:  () => Promise<void>
+  fix: BPSetFixFn
 }
+
+export type BPSetFixFn = (
+  nonCompliantResources: string[],
+  requiredParametersForFix: {
+    name: string,
+    value: string
+  }[]
+) => Promise<void>
 
 export interface BPSetMetadata {
   name: string
@@ -47,10 +46,12 @@ export interface BPSetMetadata {
     reason: string
   }[]
   adviseBeforeFixFunction: string
+}
+
+export interface BPSetStats {
   nonCompliantResources: string[]
   compliantResources: string[]
   status: 'LOADED' | 'CHECKING' | 'ERROR' | 'FINISHED'
-  idx: number
   errorMessage: {
     date: Date,
     message: string

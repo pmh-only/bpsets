@@ -1,5 +1,5 @@
-import { BPSet, BPSetMetadata } from "./types";
-import { readdir, readFile } from 'node:fs/promises'
+import { BPSet } from "./types";
+import { readdir } from 'node:fs/promises'
 import path from 'node:path'
 
 export class BPManager {
@@ -13,12 +13,8 @@ export class BPManager {
   private readonly bpSets:
     Record<string, BPSet> = {}   
 
-  private readonly bpSetMetadatas:
-    Record<string, BPSetMetadata> = {}
-
   private constructor() {
     this.loadBPSets()
-    this.loadBPSetMetadatas()
   }
 
   private async loadBPSets() {
@@ -39,72 +35,20 @@ export class BPManager {
     }
   }
 
-  private async loadBPSetMetadatas() {
-    const bpSetMetadatasRaw = await readFile(path.join(__dirname, '../bpset_metadata.json'))
-    const bpSetMetadatas = JSON.parse(bpSetMetadatasRaw.toString('utf-8')) as BPSetMetadata[]
-
-    for (const [idx, bpSetMetadata] of bpSetMetadatas.entries()) {
-      this.bpSetMetadatas[bpSetMetadata.name] = {
-        ...bpSetMetadata,
-        nonCompliantResources: [],
-        compliantResources: [],
-        status:'LOADED',
-        errorMessage: [],
-        idx
-      }
-    }
-  }
-
   public runCheckOnce(name: string) {
-    return this
-      .bpSets[name].check()
-      .catch((err) => {
-        this.bpSetMetadatas[name].status = 'ERROR'
-        this.bpSetMetadatas[name].errorMessage.push({
-          date: new Date(),
-          message: err
-        })
-
-        return undefined
-      })
-      .then((result) => {
-        if (result === undefined)
-          return
-
-        this.bpSetMetadatas[name].compliantResources = result.compliantResources
-        this.bpSetMetadatas[name].nonCompliantResources = result.nonCompliantResources
-        this.bpSetMetadatas[name].status = 'FINISHED'
-      })
+    return this.bpSets[name].check()
   }
 
   public runCheckAll(finished = (name: string) => {}) {
-    const checkJobs =
-      Object
-        .values(this.bpSetMetadatas)
-        .map(({ name }) => {
-          this.bpSetMetadatas[name].status = 'CHECKING'
+    const checkJobs: Promise<void>[] = []
 
-          return this
-            .bpSets[name].check()
-            .catch((err) => {
-              this.bpSetMetadatas[name].status = 'ERROR'
-              this.bpSetMetadatas[name].errorMessage.push({
-                date: new Date(),
-                message: err
-              })
-    
-              return undefined
-            })
-            .then((result) => {
-              if (result === undefined)
-                return
-    
-              this.bpSetMetadatas[name].compliantResources = result.compliantResources
-              this.bpSetMetadatas[name].nonCompliantResources = result.nonCompliantResources
-              this.bpSetMetadatas[name].status = 'FINISHED'
-              finished(name)
-            })
-        })
+    for (const bpset of Object.values(this.bpSets))
+      checkJobs.push(
+        bpset
+          .check()
+          .then(() =>
+            finished(bpset.getMetadata().name))
+      )
     
     return Promise.all(checkJobs)
   }
@@ -113,20 +57,11 @@ export class BPManager {
     return this
       .bpSets[name]
       .fix(
-        this.bpSetMetadatas[name].nonCompliantResources,
+        this.bpSets[name].getStats().nonCompliantResources,
         requiredParametersForFix
       )
   }
 
-  public readonly getBPSet = (name: string) =>
-    this.bpSets[name]
-
-  public readonly getBPSetMetadata = (name: string) =>
-    this.bpSetMetadatas[name]
-
   public readonly getBPSets = () =>
     Object.values(this.bpSets)
-  
-  public readonly getBPSetMetadatas = () =>
-    Object.values(this.bpSetMetadatas)
 }

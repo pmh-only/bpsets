@@ -2,9 +2,9 @@ import {
   WAFV2Client,
   ListRuleGroupsCommand,
   GetRuleGroupCommand,
-  UpdateRuleGroupCommand
+  UpdateRuleGroupCommand,
 } from '@aws-sdk/client-wafv2';
-import { BPSet } from '../../types';
+import { BPSet, BPSetFixFn, BPSetMetadata, BPSetStats } from '../../types';
 import { Memorizer } from '../../Memorizer';
 
 export class WAFv2RuleGroupNotEmpty implements BPSet {
@@ -13,13 +13,72 @@ export class WAFv2RuleGroupNotEmpty implements BPSet {
   private readonly memoRegionalClient = Memorizer.memo(this.regionalClient);
   private readonly memoGlobalClient = Memorizer.memo(this.globalClient, 'global');
 
-  private readonly getRuleGroups = async (scope: 'REGIONAL' | 'CLOUDFRONT') => {
-    const client = scope === 'REGIONAL' ? this.memoRegionalClient : this.memoGlobalClient;
-    const response = await client.send(new ListRuleGroupsCommand({ Scope: scope }));
-    return response.RuleGroups || [];
+  private readonly stats: BPSetStats = {
+    compliantResources: [],
+    nonCompliantResources: [],
+    status: 'LOADED',
+    errorMessage: [],
+  };
+
+  public readonly getMetadata = (): BPSetMetadata => ({
+    name: 'WAFv2RuleGroupNotEmpty',
+    description: 'Ensures WAFv2 Rule Groups are not empty and contain at least one rule.',
+    priority: 2,
+    priorityReason: 'Empty rule groups provide no security benefit and should be avoided.',
+    awsService: 'WAFv2',
+    awsServiceCategory: 'Web Application Firewall',
+    bestPracticeCategory: 'Security',
+    requiredParametersForFix: [
+      {
+        name: 'default-rule',
+        description: 'Default rule JSON to populate empty rule groups.',
+        default: '{}',
+        example: '{"IpSetReferenceStatement": {"Arn": "example-arn"}}',
+      },
+    ],
+    isFixFunctionUsesDestructiveCommand: false,
+    commandUsedInCheckFunction: [
+      {
+        name: 'GetRuleGroupCommand',
+        reason: 'Retrieve details of a WAFv2 Rule Group to check its rules.',
+      },
+    ],
+    commandUsedInFixFunction: [
+      {
+        name: 'UpdateRuleGroupCommand',
+        reason: 'Add default rule to empty WAFv2 Rule Groups.',
+      },
+    ],
+    adviseBeforeFixFunction:
+      'Ensure the default rule JSON is correctly formatted and meets security requirements.',
+  });
+
+  public readonly getStats = () => this.stats;
+
+  public readonly clearStats = () => {
+    this.stats.compliantResources = [];
+    this.stats.nonCompliantResources = [];
+    this.stats.status = 'LOADED';
+    this.stats.errorMessage = [];
   };
 
   public readonly check = async () => {
+    this.stats.status = 'CHECKING';
+
+    await this.checkImpl()
+      .then(() => {
+        this.stats.status = 'FINISHED';
+      })
+      .catch((err) => {
+        this.stats.status = 'ERROR';
+        this.stats.errorMessage.push({
+          date: new Date(),
+          message: err.message,
+        });
+      });
+  };
+
+  private readonly checkImpl = async () => {
     const compliantResources: string[] = [];
     const nonCompliantResources: string[] = [];
 
@@ -40,14 +99,33 @@ export class WAFv2RuleGroupNotEmpty implements BPSet {
       }
     }
 
-    return {
-      compliantResources,
-      nonCompliantResources,
-      requiredParametersForFix: [{ name: 'default-rule', value: '<DEFAULT_RULE>' }]
-    };
+    this.stats.compliantResources = compliantResources;
+    this.stats.nonCompliantResources = nonCompliantResources;
   };
 
-  public readonly fix = async (
+  private readonly getRuleGroups = async (scope: 'REGIONAL' | 'CLOUDFRONT') => {
+    const client = scope === 'REGIONAL' ? this.memoRegionalClient : this.memoGlobalClient;
+    const response = await client.send(new ListRuleGroupsCommand({ Scope: scope }));
+    return response.RuleGroups || [];
+  };
+
+  public readonly fix: BPSetFixFn = async (...args) => {
+    this.stats.status = 'CHECKING';
+
+    await this.fixImpl(...args)
+      .then(() => {
+        this.stats.status = 'FINISHED';
+      })
+      .catch((err) => {
+        this.stats.status = 'ERROR';
+        this.stats.errorMessage.push({
+          date: new Date(),
+          message: err.message,
+        });
+      });
+  };
+
+  private readonly fixImpl = async (
     nonCompliantResources: string[],
     requiredParametersForFix: { name: string; value: string }[]
   ) => {
@@ -59,7 +137,6 @@ export class WAFv2RuleGroupNotEmpty implements BPSet {
 
     for (const arn of nonCompliantResources) {
       const client = arn.includes('global') ? this.globalClient : this.regionalClient;
-
       const [name, id] = arn.split('/')[1].split(':');
 
       await client.send(
@@ -77,15 +154,15 @@ export class WAFv2RuleGroupNotEmpty implements BPSet {
               VisibilityConfig: {
                 CloudWatchMetricsEnabled: true,
                 MetricName: `DefaultRule-${name}`,
-                SampledRequestsEnabled: true
-              }
-            }
+                SampledRequestsEnabled: true,
+              },
+            },
           ],
           VisibilityConfig: {
             CloudWatchMetricsEnabled: true,
             MetricName: `RuleGroup-${name}`,
-            SampledRequestsEnabled: true
-          }
+            SampledRequestsEnabled: true,
+          },
         })
       );
     }

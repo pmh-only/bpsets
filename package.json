@@ -56,10 +56,7 @@
   },
   "pkg": {
     "scripts": "build/**/*",
-    "assets": [
-      "views/**/*",
-      "bpset_metadata.json"
-    ],
+    "assets": "views/**/*",
     "targets": [
       "node22-linuxstatic-x86_64",
       "node22-linuxstatic-arm64"

@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express'
 import { BPManager } from './BPManager'
-import { BPSetMetadata } from './types'
+import { BPSet, BPSetMetadata, BPSetStats } from './types'
 import { Memorizer } from './Memorizer'
 import path from 'path'
 
@@ -28,21 +28,24 @@ export class WebServer {
   }
   
   private getMainPage(req: Request, res: Response) {
+    const hidePass = req.query['hidePass'] === 'true'
     const bpStatus: {
       category: string,
-      metadatas: BPSetMetadata[]
+      metadatas: (BPSetMetadata&BPSetStats)[]
     }[] = []
 
-    const bpMetadatas = this.bpManager.getBPSetMetadatas()
-    const categories = new Set(bpMetadatas.map((v) => v?.awsService))
-    const hidePass = req.query['hidePass'] === 'true'
+    const bpMetadatas = this.bpManager.getBPSets().map((v, idx) => ({ ...v, idx }))
+    const categories = new Set(bpMetadatas.map((v) => v.getMetadata().awsService))
 
     for (const category of categories)
       bpStatus.push({
         category,
-        metadatas: bpMetadatas.filter((v) =>
-          v.awsService === category &&
-          (!hidePass || v.nonCompliantResources.length > 0))
+        metadatas:
+          bpMetadatas
+          .filter((v) =>
+            v.getMetadata().awsService === category &&
+            (!hidePass || v.getStats().nonCompliantResources.length > 0))
+          .map((v) => ({ ...v.getMetadata(), ...v.getStats(), idx: v.idx }))
       })
 
     res.render('index', {
