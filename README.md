@@ -7,7 +7,7 @@ Also provides Web based UI powered by bootstrap!
 ## Screenshots
 | | |
 |:-:|:-:|
-| [![](./docs/screenshot.png)]('./docs/screenshot.png) | [![](./docs/screenshot2.png)](./docs/screenshot2.png) |
+| [![](./docs/screenshot.png)](./docs/screenshot.png) | [![](./docs/screenshot2.png)](./docs/screenshot2.png) |
 | BP List | Fixing Non Compliant |
 
 ## Features
