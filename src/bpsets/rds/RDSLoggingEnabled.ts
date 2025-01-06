@@ -73,7 +73,9 @@ export class RDSLoggingEnabled implements BPSet {
     const logsForEngine: Record<string, string[]> = {
       'aurora-mysql': ['audit', 'error', 'general', 'slowquery'],
       'aurora-postgresql': ['postgresql'],
-      'docdb': ['audit', 'profiler']
+      'docdb': ['audit', 'profiler'],
+      'mysql': ['audit', 'error', 'general', 'slowquery'],
+      'postgresql': ['postgresql', 'upgrade'],
     };
 
     const dbClusters = await this.getDBClusters();
