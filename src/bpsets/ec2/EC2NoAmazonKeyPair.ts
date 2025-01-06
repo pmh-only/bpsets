@@ -68,6 +68,9 @@ export class EC2NoAmazonKeyPair implements BPSet {
 
     for (const reservation of response.Reservations || []) {
       for (const instance of reservation.Instances || []) {
+        if (instance.State?.Name === 'terminated')
+          continue
+        
         if (instance.KeyName) {
           nonCompliantResources.push(instance.InstanceId!);
         } else {

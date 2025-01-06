@@ -75,6 +75,9 @@ export class EC2TokenHopLimitCheck implements BPSet {
 
     for (const reservation of response.Reservations || []) {
       for (const instance of reservation.Instances || []) {
+        if (instance.State?.Name === 'terminated')
+          continue
+
         if (
           instance.MetadataOptions?.HttpPutResponseHopLimit &&
           instance.MetadataOptions.HttpPutResponseHopLimit < 2

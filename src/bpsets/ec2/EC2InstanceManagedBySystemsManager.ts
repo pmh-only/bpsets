@@ -84,6 +84,9 @@ export class EC2InstanceManagedBySystemsManager implements BPSet {
 
     for (const reservation of response.Reservations || []) {
       for (const instance of reservation.Instances || []) {
+        if (instance.State?.Name === 'terminated')
+          continue
+
         if (managedInstanceIds?.includes(instance.InstanceId!)) {
           compliantResources.push(instance.InstanceId!);
         } else {

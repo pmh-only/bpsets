@@ -74,6 +74,9 @@ export class EC2InstanceDetailedMonitoringEnabled implements BPSet {
 
     for (const reservation of response.Reservations || []) {
       for (const instance of reservation.Instances || []) {
+        if (instance.State?.Name === 'terminated')
+          continue
+        
         if (instance.Monitoring?.State === 'enabled') {
           compliantResources.push(instance.InstanceId!);
         } else {

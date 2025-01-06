@@ -73,6 +73,9 @@ export class EC2Imdsv2Check implements BPSet {
 
     for (const reservation of response.Reservations || []) {
       for (const instance of reservation.Instances || []) {
+        if (instance.State?.Name === 'terminated')
+          continue
+
         if (instance.MetadataOptions?.HttpTokens === 'required') {
           compliantResources.push(instance.InstanceId!);
         } else {
