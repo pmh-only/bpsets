@@ -81,6 +81,9 @@ export class ECSContainerInsightsEnabled implements BPSet {
     const clusters = await this.getClusters();
 
     for (const cluster of clusters) {
+      if (cluster.clusterName === 'default')
+        continue
+
       const containerInsightsSetting = cluster.settings?.find(
         (setting) => setting.name === 'containerInsights'
       );
