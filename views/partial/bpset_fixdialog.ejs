@@ -1,48 +1,57 @@
-<div class="offcanvas offcanvas-end" data-bs-scroll="true" tabindex="-1" id="fixdialog-<%= metadata.idx %>">
-  <div class="offcanvas-header d-flex gap-3">
-    <h3 class="offcanvas-title" style="word-break: break-all;">Fixing <%= metadata.name %></h3>
-  </div>
-  
-  <div class="offcanvas-body">
-    <h3 class="mb-3">Pending operations</h3>
-    <% metadata.commandUsedInFixFunction.forEach(({ name, reason }) => { %>
-      <div class="card mb-3">
-        <h5 class="card-header"><%= name %></h5>
-        <div class="card-body">
-          <%= reason %>
-        </div>
-      </div>
-    <% }) %>
+<div class="fixed inset-0 flex items-end justify-center sm:items-center bg-gray-800 bg-opacity-50 z-50 hidden opacity-0 transition-opacity duration-300" id="fixdialog-<%= metadata.idx %>">
+  <div class="bg-white rounded-lg shadow-lg w-full max-w-md mx-auto overflow-y-auto transform translate-y-full transition-transform duration-300">
+    <div class="p-4 border-b relative">
+      <button data-close-offcanvas class="absolute top-4 right-4 text-gray-500">&times;</button>
+      <h3 class="text-lg font-bold text-gray-700">Fixing <%= metadata.name %></h3>
+    </div>
 
-    <br>
-
-    <h3 class="mb-3">Required Parameters</h3>
-    <form method="POST" action="/fix?name=<%= metadata.name %>&hidePass=<%= hidePass %>">
-      <% metadata.requiredParametersForFix.forEach((input) => { %>
-        <div class="mb-3">
-          <label for="<%= `${metadata.name}-${input.name}` %>" class="form-label"><%= input.name %></label>
-          <input type="text" class="form-control" name="<%= input.name %>" id="<%= `${metadata.name}-${input.name}` %>" value="<%= input.default %>" required>
-          <div class="form-text">
-            <%= input.description %><br />
-            ex) <code><%= input.example %></code>
-          </div>
+    <div class="p-4">
+      <h4 class="text-md font-semibold mb-3">Pending operations</h4>
+      <% metadata.commandUsedInFixFunction.forEach(({ name, reason }) => { %>
+        <div class="bg-gray-100 p-3 rounded mb-3">
+          <h5 class="font-semibold text-gray-700"><%= name %></h5>
+          <p class="text-gray-600"><%= reason %></p>
         </div>
       <% }) %>
-      <br>
-      
-      <% if (metadata.isFixFunctionUsesDestructiveCommand) { %>
-        <div class="alert alert-danger" role="alert">
-          This Fix Function Has DESTRUCTIVE Command! please review pending operations carefully!
+
+      <h4 class="text-md font-semibold mb-3">Required Parameters</h4>
+      <form method="POST" action="/fix?name=<%= metadata.name %>&hidePass=<%= hidePass %>">
+        <% metadata.requiredParametersForFix.forEach((input) => { %>
+          <div class="mb-4">
+            <label for="<%= `${metadata.name}-${input.name}` %>" class="block text-sm font-medium text-gray-700">
+              <%= input.name %>
+            </label>
+            <input
+              type="text"
+              class="outline-none mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              name="<%= input.name %>"
+              id="<%= `${metadata.name}-${input.name}` %>"
+              value="<%= input.default %>"
+              required
+            />
+            <p class="mt-1 text-xs text-gray-500">
+              <%= input.description %><br />
+              <span class="font-mono"><%= input.example %></span>
+            </p>
+          </div>
+        <% }) %>
+
+        <% if (metadata.isFixFunctionUsesDestructiveCommand) { %>
+          <div class="p-3 bg-red-100 text-red-700 rounded mb-3">
+            This Fix Function Has DESTRUCTIVE Commands! Please review pending operations carefully.
+          </div>
+        <% } %>
+
+        <div class="p-3 bg-yellow-100 text-yellow-700 rounded mb-3">
+          <%= metadata.adviseBeforeFixFunction %>
         </div>
-      <% } %>
 
-      <div class="alert alert-warning" role="alert">
-        <%= metadata.adviseBeforeFixFunction %>
-      </div>
-
-      <br>
-
-      <button class="btn btn-primary" type="submit">Fix!</button>
-    </form>
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600">
+          Fix!
+        </button>
+      </form>
+    </div>
   </div>
 </div>

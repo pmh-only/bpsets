@@ -1,0 +1,333 @@
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const toggleHidePassButton = document.getElementById("toggleHidePass");
+    let hidePass = false;
+
+    toggleHidePassButton.addEventListener("click", () => {
+      hidePass = !hidePass; // Toggle state
+      const rows = document.querySelectorAll('tr[data-status="pass"]');
+
+      // Show or hide rows based on "Hide Pass" toggle
+      rows.forEach((row) => {
+        if (hidePass) {
+          row.classList.add("hidden");
+        } else {
+          row.classList.remove("hidden");
+        }
+      });
+
+      // Update button text
+      toggleHidePassButton.textContent = hidePass ? "Show Pass" : "Hide Pass";
+
+      // Check and hide empty category headers
+      updateCategoryHeaders();
+    });
+
+    function updateCategoryHeaders() {
+      const categoryHeaders = document.querySelectorAll("tr[data-category]");
+      categoryHeaders.forEach((header) => {
+        const category = header.getAttribute("data-category");
+        const categoryRows = document.querySelectorAll(`tr[data-category-items="${category}"]`);
+
+        // Check if all rows in the category are hidden
+        const hasVisibleRows = Array.from(categoryRows).some(
+          (row) => !row.classList.contains("hidden")
+        );
+
+        // Hide or show the category header based on visible rows
+        if (hasVisibleRows) {
+          header.classList.remove("hidden");
+        } else {
+          header.classList.add("hidden");
+        }
+      });
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const filterInput = document.getElementById("tableFilter");
+    const suggestionsList = document.getElementById("autocompleteSuggestions");
+
+    // Collect all category names and row content for autocomplete
+    const categoryHeaders = Array.from(document.querySelectorAll("tr[data-category]")).map((header) =>
+      header.getAttribute("data-category")
+    );
+    const dataRows = Array.from(document.querySelectorAll("tr[data-category-items]")).map((row) =>
+      row.textContent.trim()
+    );
+    const allSuggestions = Array.from(new Set([...categoryHeaders, ...dataRows])); // Remove duplicates
+
+    // Filter functionality with autocomplete
+    filterInput.addEventListener("input", () => {
+      const filterValue = filterInput.value.toLowerCase();
+      suggestionsList.innerHTML = "";
+
+      if (filterValue) {
+        // Show autocomplete suggestions
+        const matchingSuggestions = allSuggestions.filter((suggestion) =>
+          suggestion.toLowerCase().includes(filterValue)
+        );
+
+        if (matchingSuggestions.length > 0) {
+          suggestionsList.classList.remove("hidden");
+          matchingSuggestions.forEach((suggestion) => {
+            const suggestionItem = document.createElement("li");
+            suggestionItem.textContent = suggestion;
+            suggestionItem.className =
+              "px-4 py-2 cursor-pointer hover:bg-blue-100 text-gray-700";
+            suggestionsList.appendChild(suggestionItem);
+
+            // Handle click on suggestion
+            suggestionItem.addEventListener("click", () => {
+              filterInput.value = suggestion;
+              suggestionsList.classList.add("hidden");
+              applyFilter(suggestion.toLowerCase());
+            });
+          });
+        } else {
+          suggestionsList.classList.add("hidden");
+        }
+      } else {
+        suggestionsList.classList.add("hidden");
+      }
+
+      // Apply filter based on input value
+      applyFilter(filterValue);
+    });
+
+    // Close suggestions on blur
+    filterInput.addEventListener("blur", () => {
+      setTimeout(() => suggestionsList.classList.add("hidden"), 100); // Delay to allow click on suggestions
+    });
+
+    // Function to filter rows and headers
+    function applyFilter(filterValue) {
+      const headers = document.querySelectorAll("tr[data-category]");
+      const rows = document.querySelectorAll("tr[data-category-items]");
+
+      headers.forEach((header) => {
+        const category = header.getAttribute("data-category");
+        const categoryRows = document.querySelectorAll(`tr[data-category-items="${category}"]`);
+        let hasVisibleRows = false;
+
+        categoryRows.forEach((row) => {
+          const rowText = row.textContent.toLowerCase();
+          if (rowText.includes(filterValue) || category.toLowerCase().includes(filterValue)) {
+            row.classList.remove("hidden");
+            hasVisibleRows = true;
+          } else {
+            row.classList.add("hidden");
+          }
+        });
+
+        if (hasVisibleRows || category.toLowerCase().includes(filterValue)) {
+          header.classList.remove("hidden");
+        } else {
+          header.classList.add("hidden");
+        }
+      });
+    }
+  });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const table = document.getElementById("bpTable");
+    const tbody = table.querySelector("tbody");
+    const originalRows = Array.from(tbody.querySelectorAll("tr"));
+
+    // Initialize sorting state for all headers
+    const headers = table.querySelectorAll("thead th[data-sort]");
+    headers.forEach((header) => {
+      header.classList.add("not-sorted");
+    });
+
+    // Sorting Functionality
+    headers.forEach((header) => {
+      header.addEventListener("click", () => {
+        const sortType = header.getAttribute("data-sort");
+        const columnIndex = Array.from(header.parentNode.children).indexOf(header);
+        const rows = Array.from(tbody.querySelectorAll("tr")).filter(
+          (row) => row.querySelector("td")
+        );
+
+        // Sort rows
+        rows.sort((a, b) => {
+          const cellA = a.children[columnIndex]?.textContent.trim() || "";
+          const cellB = b.children[columnIndex]?.textContent.trim() || "";
+
+          if (sortType === "number") {
+            return parseFloat(cellA) - parseFloat(cellB);
+          } else {
+            return cellA.localeCompare(cellB);
+          }
+        });
+
+        // Toggle sorting states
+        if (header.classList.contains("ascending")) {
+          rows.reverse();
+          updateSortIndicator(header, "descending");
+        } else if (header.classList.contains("descending")) {
+          updateSortIndicator(header, "not-sorted");
+          resetToOriginalOrder();
+        } else {
+          updateSortIndicator(header, "ascending");
+        }
+
+        // Update table with sorted rows if not "not-sorted"
+        if (!header.classList.contains("not-sorted")) {
+          tbody.innerHTML = "";
+          rows.forEach((row) => tbody.appendChild(row));
+        }
+      });
+    });
+
+    function resetToOriginalOrder() {
+      tbody.innerHTML = "";
+      originalRows.forEach((row) => tbody.appendChild(row));
+    }
+
+    function updateSortIndicator(header, state) {
+      headers.forEach((h) => {
+        h.classList.remove("ascending", "descending", "not-sorted");
+        const icon = h.querySelector(".sort-indicator i");
+        if (icon) icon.className = "fas fa-sort"; // Reset all icons
+      });
+
+      header.classList.add(state);
+      const icon = header.querySelector(".sort-indicator i");
+      if (state === "ascending") {
+        icon.className = "fas fa-sort-up"; // Up arrow for ascending
+      } else if (state === "descending") {
+        icon.className = "fas fa-sort-down"; // Down arrow for descending
+      } else {
+        icon.className = "fas fa-sort"; // Default sort icon
+      }
+    }
+  });
+
+
+  // Tooltip Functionality
+  document.querySelectorAll('[data-tooltip]').forEach((el) => {
+    el.addEventListener('mouseenter', () => {
+      const tooltipText = el.getAttribute('data-tooltip');
+      const tooltipId = `tooltip-${Math.random().toString(36).substring(2, 10)}`;
+      
+      const tooltip = document.createElement('div');
+      tooltip.className = 'absolute bg-gray-800 text-white text-xs rounded py-1 px-2 shadow-lg opacity-0';
+      tooltip.style.transition = 'opacity 0.3s';
+      tooltip.style.position = 'absolute';
+      tooltip.style.zIndex = '1000';
+      tooltip.style.top = `${el.getBoundingClientRect().top - 30}px`;
+      tooltip.style.left = `${el.getBoundingClientRect().left}px`;
+      tooltip.textContent = tooltipText;
+      tooltip.id = tooltipId;
+      
+      document.body.appendChild(tooltip);
+      el.setAttribute('data-tooltip-id', tooltipId); // Associate the tooltip with the element
+      setTimeout(() => tooltip.classList.add('opacity-100'), 10);
+    });
+
+    el.addEventListener('mouseleave', () => {
+      const tooltipId = el.getAttribute('data-tooltip-id');
+      const tooltip = document.getElementById(tooltipId);
+      if (tooltip) {
+        tooltip.classList.remove('opacity-100');
+        setTimeout(() => tooltip.remove(), 300);
+      }
+    });
+  });
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    // Open Offcanvas
+    document.querySelectorAll('[data-bs-toggle="offcanvas"]').forEach((button) => {
+      button.addEventListener("click", () => {
+        const targetId = button.getAttribute("data-bs-target").substring(1); // Remove the `#`
+        const offcanvas = document.getElementById(targetId);
+
+        if (offcanvas) {
+          // Remove `hidden` immediately to make the element renderable
+          offcanvas.classList.remove("hidden");
+
+          // Add initial state for animation
+          offcanvas.classList.add("opacity-0");
+          const content = offcanvas.querySelector("div");
+          content.classList.add("translate-y-full");
+
+          // Trigger animation after rendering the initial state
+          setTimeout(() => {
+            offcanvas.classList.remove("opacity-0");
+            content.classList.remove("translate-y-full");
+            offcanvas.classList.add("opacity-100");
+            content.classList.add("translate-y-0");
+          }, 10); // Small delay to allow rendering
+        }
+      });
+    });
+
+    // Close Offcanvas
+    document.querySelectorAll('[data-close-offcanvas]').forEach((button) => {
+      button.addEventListener("click", () => {
+        const offcanvas = button.closest(".fixed");
+
+        if (offcanvas) {
+          offcanvas.classList.remove("opacity-100");
+          offcanvas.querySelector("div").classList.remove("translate-y-0");
+          offcanvas.classList.add("opacity-0");
+          offcanvas.querySelector("div").classList.add("translate-y-full");
+
+          // Wait for transition to complete before hiding the element
+          setTimeout(() => {
+            offcanvas.classList.add("hidden");
+          }, 300); // Match the duration-300 class
+        }
+      });
+    });
+
+    // Close offcanvas when clicking outside the modal content
+    document.querySelectorAll('.fixed').forEach((offcanvas) => {
+      offcanvas.addEventListener('click', (event) => {
+        if (event.target === offcanvas) {
+          offcanvas.classList.remove("opacity-100");
+          offcanvas.querySelector("div").classList.remove("translate-y-0");
+          offcanvas.classList.add("opacity-0");
+          offcanvas.querySelector("div").classList.add("translate-y-full");
+
+          // Wait for transition to complete before hiding the element
+          setTimeout(() => {
+            offcanvas.classList.add("hidden");
+          }, 300); // Match the duration-300 class
+        }
+      });
+    });
+  });
+
+
+  // Collapsible Functionality
+  document.querySelectorAll('[data-bs-toggle="collapse"]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const targetId = button.getAttribute('data-bs-target').substring(1);
+      const collapsible = document.getElementById(targetId);
+
+      if (collapsible) {
+        if (collapsible.classList.contains('hidden')) {
+          // Temporarily remove the hidden class to calculate scrollHeight
+          collapsible.classList.remove('hidden');
+          const scrollHeight = collapsible.scrollHeight;
+          collapsible.style.maxHeight = '0'; // Reset max-height for animation
+          setTimeout(() => {
+            collapsible.style.transition = 'max-height 0.3s ease-in-out';
+            collapsible.style.maxHeight = `${scrollHeight}px`;
+          }, 10);
+        } else {
+          // Collapse the element
+          collapsible.style.maxHeight = '0';
+          setTimeout(() => {
+            collapsible.classList.add('hidden'); // Fully hide after animation
+            collapsible.style.maxHeight = null; // Reset max-height for future toggles
+          }, 300); // Match the duration of the transition
+        }
+      }
+    });
+  });
+</script>

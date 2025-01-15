@@ -1,8 +1,30 @@
-<td>
-  <div class="btn-group">
-    <button type="button" class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#fixdialog-<%= metadata.idx %>">Fix</button>
-    <a href="/check?name=<%= metadata.name %>&hidePass=<% hidePass %>" type="button" class="btn btn-secondary">Recheck</a>
-    <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#detail-<%= metadata.idx %>">Details</button>
-    <button type="button" class="btn btn-secondary" data-bs-toggle="collapse" data-bs-target="#logs-<%= metadata.idx %>">Logs</button>
+<td class="py-3 px-4">
+  <div class="flex space-x-2">
+    <button
+      type="button"
+      class="bg-blue-500 text-white px-3 py-2 rounded shadow hover:bg-blue-600"
+      data-bs-toggle="offcanvas"
+      data-bs-target="#fixdialog-<%= metadata.idx %>">
+      Fix
+    </button>
+    <a
+      href="/check?name=<%= metadata.name %>&hidePass=<%= hidePass %>"
+      class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600">
+      Recheck
+    </a>
+    <button
+      type="button"
+      class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600"
+      data-bs-toggle="collapse"
+      data-bs-target="#detail-<%= metadata.idx %>">
+      Details
+    </button>
+    <button
+      type="button"
+      class="bg-gray-500 text-white px-3 py-2 rounded shadow hover:bg-gray-600"
+      data-bs-toggle="collapse"
+      data-bs-target="#logs-<%= metadata.idx %>">
+      Logs
+    </button>
   </div>
 </td>

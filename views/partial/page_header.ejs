@@ -10,33 +10,35 @@
   const errorCount = metadatas.filter((v) => v.status === 'ERROR').length
 %>
 
-<div class="d-flex justify-content-between align-items-end">
+<div class="flex justify-between items-center mb-6">
   <div>
-    <h1 class="fw-bold">BPSets (<%= bpLength %>)</h1>
-    <p>Created by Minhyeok Park</p>
+    <h1 class="text-2xl font-bold">BPSets (<%= bpLength %>)</h1>
+    <p class="text-gray-500">Created by Minhyeok Park</p>
   </div>
 
-  <div class="d-flex status gap-3 text-center">
+  <div class="flex space-x-6 text-center">
     <div>
-      <p class="m-0">Pass</p>
-      <p class="fs-3"><%= passCount %></p>
+      <p class="text-sm text-gray-600">Pass</p>
+      <p class="text-xl font-semibold text-green-500"><%= passCount %></p>
     </div>
     <div>
-      <p class="m-0">Fail</p>
-      <p class="fs-3"><%= failCount %></p>
+      <p class="text-sm text-gray-600">Fail</p>
+      <p class="text-xl font-semibold text-red-500"><%= failCount %></p>
     </div>
     <div>
-      <p class="m-0">Error</p>
-      <p class="fs-3"><%= errorCount %></p>
+      <p class="text-sm text-gray-600">Error</p>
+      <p class="text-xl font-semibold text-yellow-500"><%= errorCount %></p>
     </div>
   </div>
 
-  <div class="btn-group">
-    <a href="/check_all?hidePass=<% hidePass %>" type="button" class="btn btn-primary">Check All</a>
-    <% if (hidePass) { %>
-      <a href="/?hidePass=false" type="button" class="btn btn-secondary">Show Pass</a>
-    <% } else { %>
-      <a href="/?hidePass=true" type="button" class="btn btn-secondary">Hide Pass</a>
-    <% } %>
+  <div class="space-x-2">
+    <a href="/check_all?hidePass=<%= hidePass %>" class="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600 inline-block">
+      Check All
+    </a>
+    <button
+      id="toggleHidePass"
+      class="bg-blue-500 text-white px-4 py-2 rounded-md shadow hover:bg-blue-600">
+      Hide Pass
+    </button>
   </div>
 </div>

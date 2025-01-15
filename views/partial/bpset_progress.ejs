@@ -12,46 +12,36 @@
 %>
 
 <% if (metadata.status === 'FINISHED') { %>
-  <td>
-    <span class="badge text-bg-<%= isPass ? 'success' : 'danger' %>">
+  <td class="py-3 px-4">
+    <span
+      class="inline-block px-2 py-1 text-xs font-medium rounded-full bg-<%= isPass ? 'green' : 'red' %>-200 text-<%= isPass ? 'green' : 'red' %>-800">
       <%= isPass ? 'Pass' : 'Fail' %>
     </span>
   </td>
 
-  <td>
-    <div class="progress" role="progressbar">
-      <div class="progress-bar" style="width: <%= passPercent %>%"></div>
+  <td class="py-3 px-4">
+    <div class="relative w-full bg-gray-200 h-4 rounded-md">
+      <div class="absolute top-0 left-0 h-4 bg-green-500 rounded-md" style="width: <%= passPercent %>%"></div>
     </div>
-    (<%= passResources %>/<%= totalResources %>)
+    <span class="block mt-1 text-sm text-gray-600">
+      (<%= passResources %>/<%= totalResources %>)
+    </span>
   </td>
-<% } %>
-
-<% if (metadata.status === 'CHECKING') { %>
-  <td colspan="2">
-    <div class="progress" role="progressbar">
-      <div class="progress-bar progress-bar-striped progress-bar-animated bg-secondary" style="width: 100%"></div>
+<% } else if (metadata.status === 'CHECKING') { %>
+  <td colspan="2" class="py-3 px-4">
+    <div class="relative w-full bg-gray-200 h-4 rounded-md">
+      <div class="absolute top-0 left-0 h-4 bg-gray-500 animate-pulse"></div>
     </div>
-
-    <p class="m-0">Progressing</p>
+    <p class="mt-1 text-sm text-gray-600">Progressing</p>
   </td>
-<% } %>
-
-<% if (metadata.status === 'ERROR') { %>
-  <td colspan="2">
-    <div class="progress" role="progressbar">
-      <div class="progress-bar progress-bar-striped bg-danger" style="width: 100%"></div>
-    </div>
-
-    <p class="m-0">Error</p>
+<% } else if (metadata.status === 'ERROR') { %>
+  <td colspan="2" class="py-3 px-4">
+    <div class="relative w-full bg-red-200 h-4 rounded-md"></div>
+    <p class="mt-1 text-sm text-red-500">Error</p>
   </td>
-<% } %>
-
-<% if (metadata.status === 'LOADED') { %>
-  <td colspan="2">
-    <div class="progress" role="progressbar">
-      <div class="progress-bar" style="width: 0%"></div>
-    </div>
-
-    <p class="m-0">Ready</p>
+<% } else if (metadata.status === 'LOADED') { %>
+  <td colspan="2" class="py-3 px-4">
+    <div class="relative w-full bg-gray-200 h-4 rounded-md"></div>
+    <p class="mt-1 text-sm text-gray-600">Ready</p>
   </td>
 <% } %>

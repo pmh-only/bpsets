@@ -1,30 +1,27 @@
 <tr>
   <td colspan="7" class="p-0">
-    <div class="collapse" id="logs-<%= metadata.idx %>">
-      <div class="bg-light p-3">
-        <h4>Non-Compliant Resources</h4>
-        <ul>
+    <div class="overflow-hidden max-h-0 hidden" id="logs-<%= metadata.idx %>">
+      <div class="bg-gray-50 p-4">
+        <h4 class="text-lg font-semibold">Non-Compliant Resources</h4>
+        <ul class="list-disc list-inside">
           <% metadata.nonCompliantResources.forEach((id) => { %>
-            <li><%= id %></li>
+            <li class="text-gray-700"><%= id %></li>
           <% }) %>
         </ul>
 
-        <br>
-
-        <h4>Compliant Resources</h4>
-        <ul>
+        <h4 class="text-lg font-semibold mt-4">Compliant Resources</h4>
+        <ul class="list-disc list-inside">
           <% metadata.compliantResources.forEach((id) => { %>
-            <li><%= id %></li>
+            <li class="text-gray-700"><%= id %></li>
           <% }) %>
         </ul>
-        <br>
 
-        <h4>Error Logs</h4>
-        <ul>
+        <h4 class="text-lg font-semibold mt-4">Error Logs</h4>
+        <ul class="list-disc list-inside">
           <% metadata.errorMessage.forEach((log) => { %>
             <li>
-              <p><%= log.date %></p>
-              <pre><%= log.message %></pre>
+              <p class="font-semibold text-gray-700"><%= log.date %></p>
+              <pre class="bg-gray-200 p-3 rounded"><%= log.message %></pre>
             </li>
           <% }) %>
         </ul>

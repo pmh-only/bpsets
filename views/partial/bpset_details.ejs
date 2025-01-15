@@ -1,57 +1,51 @@
 <%
-  const priorityLabel = ['CRITICAL', 'Required', 'Recommend'][metadata.priority-1] || 'Recommend'
-  const priorityColor = ['danger', 'warning', 'secondary'][metadata.priority-1] || 'secondary'
+  const priorityLabel = ['CRITICAL', 'Required', 'Recommend'][metadata.priority - 1] || 'Recommend';
+  const priorityColor = ['red', 'yellow', 'gray'][metadata.priority - 1] || 'gray';
 %>
 
 <tr>
   <td colspan="7" class="p-0">
-    <div class="collapse" id="detail-<%= metadata.idx %>">
-      <div class="bg-light p-3">
-        <h3><%= metadata.name %></h3>
-        <p><%= metadata.description %></p>
+    <div class="overflow-hidden max-h-0 hidden" id="detail-<%= metadata.idx %>">
+      <div class="bg-gray-100 p-4">
+        <h3 class="text-xl font-semibold"><%= metadata.name %></h3>
+        <p class="text-gray-700"><%= metadata.description %></p>
 
-        <p>
-          Category:
-          <span class="badge text-bg-secondary"><%= metadata.bestPracticeCategory %></span>
-          <%= metadata.awsServiceCategory %> - <%= metadata.awsService %>
+        <p class="mt-2">
+          <span class="font-bold">Category:</span>
+          <span class="bg-gray-200 text-gray-700 px-2 py-1 rounded"><%= metadata.bestPracticeCategory %></span>
+          <span class="text-gray-500"><%= metadata.awsServiceCategory %> - <%= metadata.awsService %></span>
         </p>
 
-        <p>
-          Priority:
-          <span class="badge text-bg-<%= priorityColor %>">
+        <p class="mt-2">
+          <span class="font-bold">Priority:</span>
+          <span class="bg-<%= priorityColor %>-200 text-<%= priorityColor %>-800 px-2 py-1 rounded">
             <%= metadata.priority %> - <%= priorityLabel %>
           </span>
-
-          <%= metadata.priorityReason %>
+          <span class="text-gray-500"><%= metadata.priorityReason %></span>
         </p>
 
-        <h4>Operations used in check function</h4>
-        <div class="row row-cols-3">
-          <% metadata.commandUsedInCheckFunction.forEach(({ name, reason }) => { %>
-            <div class="col">
-              <div class="card">
-                <h5 class="card-header"><%= name %></h5>
-                <div class="card-body">
-                  <%= reason %>
-                </div>
+        <div class="mt-4">
+          <h4 class="text-lg font-semibold">Operations used in check function</h4>
+          <div class="grid grid-cols-3 gap-4 mt-2">
+            <% metadata.commandUsedInCheckFunction.forEach(({ name, reason }) => { %>
+              <div class="bg-white shadow rounded p-3">
+                <h5 class="text-sm font-bold"><%= name %></h5>
+                <p class="text-sm text-gray-600"><%= reason %></p>
               </div>
-            </div>
-          <% }) %>
+            <% }) %>
+          </div>
         </div>
-        <br>
-        
-        <h4>Operations used in fix function</h4>
-        <div class="row row-cols-3">
-          <% metadata.commandUsedInFixFunction.forEach(({ name, reason }) => { %>
-            <div class="col">
-              <div class="card">
-                <h5 class="card-header"><%= name %></h5>
-                <div class="card-body">
-                  <%= reason %>
-                </div>
+
+        <div class="mt-4">
+          <h4 class="text-lg font-semibold">Operations used in fix function</h4>
+          <div class="grid grid-cols-3 gap-4 mt-2">
+            <% metadata.commandUsedInFixFunction.forEach(({ name, reason }) => { %>
+              <div class="bg-white shadow rounded p-3">
+                <h5 class="text-sm font-bold"><%= name %></h5>
+                <p class="text-sm text-gray-600"><%= reason %></p>
               </div>
-            </div>
-          <% }) %>
+            <% }) %>
+          </div>
         </div>
       </div>
     </div>

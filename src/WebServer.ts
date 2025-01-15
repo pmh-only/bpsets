@@ -59,6 +59,9 @@ export class WebServer {
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Transfer-Encoding', 'chunked')
 
+    res.write('<script src="https://cdn.tailwindcss.com"></script>')
+    res.write('<body class="bg-gray-100 text-gray-800">')
+    res.write('<div class="container mx-auto p-4">')
     res.write('<script>setInterval(() => window.scrollTo(0, document.body.scrollHeight), 100)</script>')
     res.write('<pre>Start Checking....\n')
 
@@ -72,7 +75,8 @@ export class WebServer {
     Memorizer.reset()
     await this.bpManager.runCheckOnce(name)
 
-    res.write(`<a href="/?hidePass=${hidePass}">Done. Return to Report Page`)
+    res.write(`<a href="/?hidePass=${hidePass}">Done. Return to Report Page</a>`)
+    res.write(`<script>window.location.replace('/?hidePass=${hidePass}')</script>`)
     res.end()
   }
 
@@ -82,6 +86,9 @@ export class WebServer {
 
     const { hidePass } = req.query
 
+    res.write('<script src="https://cdn.tailwindcss.com"></script>')
+    res.write('<body class="bg-gray-100 text-gray-800">')
+    res.write('<div class="container mx-auto p-4">')
     res.write('<script>setInterval(() => window.scrollTo(0, document.body.scrollHeight), 100)</script>')
     res.write('<pre>Start Checking....\n')
 
@@ -89,7 +96,8 @@ export class WebServer {
     await this.bpManager.runCheckAll((name) =>
       res.write(`${name} - FINISHED\n`))
 
-    res.write(`<a href="/?hidePass=${hidePass}">Done. Return to Report Page`)
+    res.write(`<a href="/?hidePass=${hidePass}">Done. Return to Report Page</a>`)
+    res.write(`<script>window.location.replace('/?hidePass=${hidePass}')</script>`)
     res.end()
   }
 
@@ -97,6 +105,9 @@ export class WebServer {
     res.setHeader('Content-Type', 'text/html; charset=utf-8')
     res.setHeader('Transfer-Encoding', 'chunked')
 
+    res.write('<script src="https://cdn.tailwindcss.com"></script>')
+    res.write('<body class="bg-gray-100 text-gray-800">')
+    res.write('<div class="container mx-auto p-4">')
     res.write('<pre>Start Fixing....\n')
     
     const { name, hidePass } = req.query
@@ -117,6 +128,7 @@ export class WebServer {
       })
 
     res.write(`<a href="/?hidePass=${hidePass}">Done. Return to Report Page`)
+    res.write(`<script>window.location.replace('/?hidePass=${hidePass}')</script>`)
     res.end()
   }
 
