@@ -1,19 +1,19 @@
 import {
   ElastiCacheClient,
   DescribeReplicationGroupsCommand,
-  ModifyReplicationGroupCommand,
-} from '@aws-sdk/client-elasticache';
-import { BPSet, BPSetStats, BPSetFixFn } from '../../types';
-import { Memorizer } from '../../Memorizer';
+  ModifyReplicationGroupCommand
+} from '@aws-sdk/client-elasticache'
+import { BPSet, BPSetStats, BPSetFixFn } from '../../types'
+import { Memorizer } from '../../Memorizer'
 
 export class ElastiCacheReplGrpAutoFailoverEnabled implements BPSet {
-  private readonly client = new ElastiCacheClient({});
-  private readonly memoClient = Memorizer.memo(this.client);
+  private readonly client = new ElastiCacheClient({})
+  private readonly memoClient = Memorizer.memo(this.client)
 
   private readonly getReplicationGroups = async () => {
-    const response = await this.memoClient.send(new DescribeReplicationGroupsCommand({}));
-    return response.ReplicationGroups || [];
-  };
+    const response = await this.memoClient.send(new DescribeReplicationGroupsCommand({}))
+    return response.ReplicationGroups || []
+  }
 
   public readonly getMetadata = () => ({
     name: 'ElastiCacheReplGrpAutoFailoverEnabled',
@@ -28,75 +28,76 @@ export class ElastiCacheReplGrpAutoFailoverEnabled implements BPSet {
     commandUsedInCheckFunction: [
       {
         name: 'DescribeReplicationGroupsCommand',
-        reason: 'Fetches replication group details to verify automatic failover settings.',
-      },
+        reason: 'Fetches replication group details to verify automatic failover settings.'
+      }
     ],
     commandUsedInFixFunction: [
       {
         name: 'ModifyReplicationGroupCommand',
-        reason: 'Enables automatic failover for replication groups.',
-      },
+        reason: 'Enables automatic failover for replication groups.'
+      }
     ],
-    adviseBeforeFixFunction: 'Ensure the environment supports multi-AZ configurations before enabling automatic failover.',
-  });
+    adviseBeforeFixFunction:
+      'Ensure the environment supports multi-AZ configurations before enabling automatic failover.'
+  })
 
   private readonly stats: BPSetStats = {
     compliantResources: [],
     nonCompliantResources: [],
     status: 'LOADED',
-    errorMessage: [],
-  };
+    errorMessage: []
+  }
 
-  public readonly getStats = () => this.stats;
+  public readonly getStats = () => this.stats
 
   public readonly clearStats = () => {
-    this.stats.compliantResources = [];
-    this.stats.nonCompliantResources = [];
-    this.stats.status = 'LOADED';
-    this.stats.errorMessage = [];
-  };
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
 
   public readonly check = async () => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.checkImpl().then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   private readonly checkImpl = async () => {
-    const compliantResources: string[] = [];
-    const nonCompliantResources: string[] = [];
-    const replicationGroups = await this.getReplicationGroups();
+    const compliantResources: string[] = []
+    const nonCompliantResources: string[] = []
+    const replicationGroups = await this.getReplicationGroups()
 
     for (const group of replicationGroups) {
       if (group.AutomaticFailover === 'enabled') {
-        compliantResources.push(group.ARN!);
+        compliantResources.push(group.ARN!)
       } else {
-        nonCompliantResources.push(group.ARN!);
+        nonCompliantResources.push(group.ARN!)
       }
     }
 
-    this.stats.compliantResources = compliantResources;
-    this.stats.nonCompliantResources = nonCompliantResources;
-  };
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+  }
 
   public readonly fix: BPSetFixFn = async (nonCompliantResources) => {
     for (const arn of nonCompliantResources) {
-      const groupId = arn.split(':replication-group:')[1];
+      const groupId = arn.split(':replication-group:')[1]
       await this.client.send(
         new ModifyReplicationGroupCommand({
           ReplicationGroupId: groupId,
-          AutomaticFailoverEnabled: true,
+          AutomaticFailoverEnabled: true
         })
-      );
+      )
     }
-  };
+  }
 }

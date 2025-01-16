@@ -1,22 +1,17 @@
-import {
-  SNSClient,
-  ListTopicsCommand,
-  GetTopicAttributesCommand,
-  SetTopicAttributesCommand,
-} from '@aws-sdk/client-sns';
-import { BPSet, BPSetMetadata, BPSetStats } from '../../types';
-import { Memorizer } from '../../Memorizer';
+import { SNSClient, ListTopicsCommand, GetTopicAttributesCommand, SetTopicAttributesCommand } from '@aws-sdk/client-sns'
+import { BPSet, BPSetMetadata, BPSetStats } from '../../types'
+import { Memorizer } from '../../Memorizer'
 
 export class SNSEncryptedKMS implements BPSet {
-  private readonly client = new SNSClient({});
-  private readonly memoClient = Memorizer.memo(this.client);
+  private readonly client = new SNSClient({})
+  private readonly memoClient = Memorizer.memo(this.client)
 
   private readonly stats: BPSetStats = {
     compliantResources: [],
     nonCompliantResources: [],
     status: 'LOADED',
-    errorMessage: [],
-  };
+    errorMessage: []
+  }
 
   public readonly getMetadata = (): BPSetMetadata => ({
     name: 'SNSEncryptedKMS',
@@ -31,99 +26,98 @@ export class SNSEncryptedKMS implements BPSet {
         name: 'kms-key-id',
         description: 'The ARN or ID of the KMS key to use for encryption.',
         default: '',
-        example: 'arn:aws:kms:us-east-1:123456789012:key/abcd-1234-efgh-5678',
-      },
+        example: 'arn:aws:kms:us-east-1:123456789012:key/abcd-1234-efgh-5678'
+      }
     ],
     isFixFunctionUsesDestructiveCommand: false,
     commandUsedInCheckFunction: [
       {
         name: 'ListTopicsCommand',
-        reason: 'Lists all SNS topics in the account.',
+        reason: 'Lists all SNS topics in the account.'
       },
       {
         name: 'GetTopicAttributesCommand',
-        reason: 'Retrieves attributes for each SNS topic.',
-      },
+        reason: 'Retrieves attributes for each SNS topic.'
+      }
     ],
     commandUsedInFixFunction: [
       {
         name: 'SetTopicAttributesCommand',
-        reason: 'Sets the KMS key for encryption on the SNS topic.',
-      },
+        reason: 'Sets the KMS key for encryption on the SNS topic.'
+      }
     ],
-    adviseBeforeFixFunction:
-      'Ensure that the specified KMS key has the necessary permissions to encrypt SNS topics.',
-  });
+    adviseBeforeFixFunction: 'Ensure that the specified KMS key has the necessary permissions to encrypt SNS topics.'
+  })
 
-  public readonly getStats = () => this.stats;
+  public readonly getStats = () => this.stats
 
   public readonly clearStats = () => {
-    this.stats.compliantResources = [];
-    this.stats.nonCompliantResources = [];
-    this.stats.status = 'LOADED';
-    this.stats.errorMessage = [];
-  };
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
 
   public readonly check = async () => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.checkImpl()
       .then(() => {
-        this.stats.status = 'FINISHED';
+        this.stats.status = 'FINISHED'
       })
       .catch((err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
-      });
-  };
+          message: err.message
+        })
+      })
+  }
 
   private readonly checkImpl = async () => {
-    const compliantResources: string[] = [];
-    const nonCompliantResources: string[] = [];
-    const topics = await this.getTopics();
+    const compliantResources: string[] = []
+    const nonCompliantResources: string[] = []
+    const topics = await this.getTopics()
 
     for (const topic of topics) {
-      if ((topic as any).KmsMasterKeyId) {
-        compliantResources.push(topic.TopicArn!);
+      if ((topic as unknown).KmsMasterKeyId) {
+        compliantResources.push(topic.TopicArn!)
       } else {
-        nonCompliantResources.push(topic.TopicArn!);
+        nonCompliantResources.push(topic.TopicArn!)
       }
     }
 
-    this.stats.compliantResources = compliantResources;
-    this.stats.nonCompliantResources = nonCompliantResources;
-  };
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+  }
 
   public readonly fix = async (
     nonCompliantResources: string[],
     requiredParametersForFix: { name: string; value: string }[]
   ) => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.fixImpl(nonCompliantResources, requiredParametersForFix)
       .then(() => {
-        this.stats.status = 'FINISHED';
+        this.stats.status = 'FINISHED'
       })
       .catch((err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
-      });
-  };
+          message: err.message
+        })
+      })
+  }
 
   private readonly fixImpl = async (
     nonCompliantResources: string[],
     requiredParametersForFix: { name: string; value: string }[]
   ) => {
-    const kmsKeyId = requiredParametersForFix.find((param) => param.name === 'kms-key-id')?.value;
+    const kmsKeyId = requiredParametersForFix.find((param) => param.name === 'kms-key-id')?.value
 
     if (!kmsKeyId) {
-      throw new Error("Required parameter 'kms-key-id' is missing.");
+      throw new Error("Required parameter 'kms-key-id' is missing.")
     }
 
     for (const arn of nonCompliantResources) {
@@ -131,24 +125,22 @@ export class SNSEncryptedKMS implements BPSet {
         new SetTopicAttributesCommand({
           TopicArn: arn,
           AttributeName: 'KmsMasterKeyId',
-          AttributeValue: kmsKeyId,
+          AttributeValue: kmsKeyId
         })
-      );
+      )
     }
-  };
+  }
 
   private readonly getTopics = async () => {
-    const topicsResponse = await this.memoClient.send(new ListTopicsCommand({}));
-    const topics = topicsResponse.Topics || [];
+    const topicsResponse = await this.memoClient.send(new ListTopicsCommand({}))
+    const topics = topicsResponse.Topics || []
 
-    const topicDetails = [];
+    const topicDetails = []
     for (const topic of topics) {
-      const attributes = await this.memoClient.send(
-        new GetTopicAttributesCommand({ TopicArn: topic.TopicArn! })
-      );
-      topicDetails.push({ ...attributes.Attributes, TopicArn: topic.TopicArn! });
+      const attributes = await this.memoClient.send(new GetTopicAttributesCommand({ TopicArn: topic.TopicArn! }))
+      topicDetails.push({ ...attributes.Attributes, TopicArn: topic.TopicArn! })
     }
 
-    return topicDetails;
-  };
+    return topicDetails
+  }
 }

@@ -2,25 +2,23 @@ import {
   CodeBuildClient,
   ListProjectsCommand,
   BatchGetProjectsCommand,
-  UpdateProjectCommand,
-} from '@aws-sdk/client-codebuild';
-import { BPSet, BPSetFixFn, BPSetStats } from '../../types';
-import { Memorizer } from '../../Memorizer';
+  UpdateProjectCommand
+} from '@aws-sdk/client-codebuild'
+import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
+import { Memorizer } from '../../Memorizer'
 
 export class CodeBuildProjectLoggingEnabled implements BPSet {
-  private readonly client = new CodeBuildClient({});
-  private readonly memoClient = Memorizer.memo(this.client);
+  private readonly client = new CodeBuildClient({})
+  private readonly memoClient = Memorizer.memo(this.client)
 
   private readonly getProjects = async () => {
-    const projectNames = await this.memoClient.send(new ListProjectsCommand({}));
+    const projectNames = await this.memoClient.send(new ListProjectsCommand({}))
     if (!projectNames.projects?.length) {
-      return [];
+      return []
     }
-    const response = await this.memoClient.send(
-      new BatchGetProjectsCommand({ names: projectNames.projects })
-    );
-    return response.projects || [];
-  };
+    const response = await this.memoClient.send(new BatchGetProjectsCommand({ names: projectNames.projects }))
+    return response.projects || []
+  }
 
   public readonly getMetadata = () => ({
     name: 'CodeBuildProjectLoggingEnabled',
@@ -35,96 +33,93 @@ export class CodeBuildProjectLoggingEnabled implements BPSet {
     commandUsedInCheckFunction: [
       {
         name: 'ListProjectsCommand',
-        reason: 'Retrieve all CodeBuild projects to verify logging settings.',
+        reason: 'Retrieve all CodeBuild projects to verify logging settings.'
       },
       {
         name: 'BatchGetProjectsCommand',
-        reason: 'Fetch detailed configuration for each CodeBuild project.',
-      },
+        reason: 'Fetch detailed configuration for each CodeBuild project.'
+      }
     ],
     commandUsedInFixFunction: [
       {
         name: 'UpdateProjectCommand',
-        reason: 'Enable logging for projects that have it disabled.',
-      },
+        reason: 'Enable logging for projects that have it disabled.'
+      }
     ],
-    adviseBeforeFixFunction: 'Ensure the default log group and stream names are suitable for your organization.',
-  });
+    adviseBeforeFixFunction: 'Ensure the default log group and stream names are suitable for your organization.'
+  })
 
   private readonly stats: BPSetStats = {
     nonCompliantResources: [],
     compliantResources: [],
     status: 'LOADED',
-    errorMessage: [],
-  };
+    errorMessage: []
+  }
 
-  public readonly getStats = () => this.stats;
+  public readonly getStats = () => this.stats
 
   public readonly clearStats = () => {
-    this.stats.compliantResources = [];
-    this.stats.nonCompliantResources = [];
-    this.stats.status = 'LOADED';
-    this.stats.errorMessage = [];
-  };
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
 
   public readonly check = async () => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.checkImpl().then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   private readonly checkImpl = async () => {
-    const compliantResources: string[] = [];
-    const nonCompliantResources: string[] = [];
-    const projects = await this.getProjects();
+    const compliantResources: string[] = []
+    const nonCompliantResources: string[] = []
+    const projects = await this.getProjects()
 
     for (const project of projects) {
-      const logsConfig = project.logsConfig;
-      if (
-        logsConfig?.cloudWatchLogs?.status === 'ENABLED' ||
-        logsConfig?.s3Logs?.status === 'ENABLED'
-      ) {
-        compliantResources.push(project.arn!);
+      const logsConfig = project.logsConfig
+      if (logsConfig?.cloudWatchLogs?.status === 'ENABLED' || logsConfig?.s3Logs?.status === 'ENABLED') {
+        compliantResources.push(project.arn!)
       } else {
-        nonCompliantResources.push(project.arn!);
+        nonCompliantResources.push(project.arn!)
       }
     }
 
-    this.stats.compliantResources = compliantResources;
-    this.stats.nonCompliantResources = nonCompliantResources;
-  };
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+  }
 
   public readonly fix: BPSetFixFn = async (...args) => {
     await this.fixImpl(...args).then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   public readonly fixImpl: BPSetFixFn = async (nonCompliantResources) => {
-    const projects = await this.getProjects();
+    const projects = await this.getProjects()
 
     for (const arn of nonCompliantResources) {
-      const projectName = arn.split(':').pop()!;
-      const projectToFix = projects.find((project) => project.arn === arn);
+      const projectName = arn.split(':').pop()!
+      const projectToFix = projects.find((project) => project.arn === arn)
 
       if (!projectToFix) {
-        continue;
+        continue
       }
 
       await this.client.send(
@@ -135,11 +130,11 @@ export class CodeBuildProjectLoggingEnabled implements BPSet {
             cloudWatchLogs: {
               status: 'ENABLED',
               groupName: 'default-cloudwatch-group',
-              streamName: 'default-stream',
-            },
-          },
+              streamName: 'default-stream'
+            }
+          }
         })
-      );
+      )
     }
-  };
+  }
 }

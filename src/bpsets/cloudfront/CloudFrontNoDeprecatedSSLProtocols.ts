@@ -2,29 +2,27 @@ import {
   CloudFrontClient,
   ListDistributionsCommand,
   GetDistributionCommand,
-  UpdateDistributionCommand,
-} from '@aws-sdk/client-cloudfront';
-import { BPSet, BPSetFixFn, BPSetStats } from '../../types';
-import { Memorizer } from '../../Memorizer';
+  UpdateDistributionCommand
+} from '@aws-sdk/client-cloudfront'
+import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
+import { Memorizer } from '../../Memorizer'
 
 export class CloudFrontNoDeprecatedSSLProtocols implements BPSet {
-  private readonly client = new CloudFrontClient({});
-  private readonly memoClient = Memorizer.memo(this.client);
+  private readonly client = new CloudFrontClient({})
+  private readonly memoClient = Memorizer.memo(this.client)
 
   private readonly getDistributions = async () => {
-    const response = await this.memoClient.send(new ListDistributionsCommand({}));
-    return response.DistributionList?.Items || [];
-  };
+    const response = await this.memoClient.send(new ListDistributionsCommand({}))
+    return response.DistributionList?.Items || []
+  }
 
   private readonly getDistributionDetails = async (distributionId: string) => {
-    const response = await this.memoClient.send(
-      new GetDistributionCommand({ Id: distributionId })
-    );
+    const response = await this.memoClient.send(new GetDistributionCommand({ Id: distributionId }))
     return {
       distribution: response.Distribution!,
-      etag: response.ETag!,
-    };
-  };
+      etag: response.ETag!
+    }
+  }
 
   public readonly getMetadata = () => ({
     name: 'CloudFrontNoDeprecatedSSLProtocols',
@@ -39,94 +37,92 @@ export class CloudFrontNoDeprecatedSSLProtocols implements BPSet {
     commandUsedInCheckFunction: [
       {
         name: 'ListDistributionsCommand',
-        reason: 'List all CloudFront distributions to check for deprecated SSL protocols.',
+        reason: 'List all CloudFront distributions to check for deprecated SSL protocols.'
       },
       {
         name: 'GetDistributionCommand',
-        reason: 'Retrieve distribution details to identify deprecated SSL protocols in origin configuration.',
-      },
+        reason: 'Retrieve distribution details to identify deprecated SSL protocols in origin configuration.'
+      }
     ],
     commandUsedInFixFunction: [
       {
         name: 'UpdateDistributionCommand',
-        reason: 'Remove deprecated SSL protocols from the origin configuration of the distribution.',
-      },
+        reason: 'Remove deprecated SSL protocols from the origin configuration of the distribution.'
+      }
     ],
-    adviseBeforeFixFunction: 'Ensure the origins are configured to support only secure and modern SSL protocols.',
-  });
+    adviseBeforeFixFunction: 'Ensure the origins are configured to support only secure and modern SSL protocols.'
+  })
 
   private readonly stats: BPSetStats = {
     nonCompliantResources: [],
     compliantResources: [],
     status: 'LOADED',
-    errorMessage: [],
-  };
+    errorMessage: []
+  }
 
-  public readonly getStats = () => this.stats;
+  public readonly getStats = () => this.stats
 
   public readonly clearStats = () => {
-    this.stats.compliantResources = [];
-    this.stats.nonCompliantResources = [];
-    this.stats.status = 'LOADED';
-    this.stats.errorMessage = [];
-  };
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
 
   public readonly check = async () => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.checkImpl().then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   private readonly checkImpl = async () => {
-    const compliantResources: string[] = [];
-    const nonCompliantResources: string[] = [];
-    const distributions = await this.getDistributions();
+    const compliantResources: string[] = []
+    const nonCompliantResources: string[] = []
+    const distributions = await this.getDistributions()
 
     for (const distribution of distributions) {
-      const { distribution: details } = await this.getDistributionDetails(distribution.Id!);
+      const { distribution: details } = await this.getDistributionDetails(distribution.Id!)
       const hasDeprecatedSSL = details.DistributionConfig?.Origins?.Items?.some(
-        (origin) =>
-          origin.CustomOriginConfig &&
-          origin.CustomOriginConfig.OriginSslProtocols?.Items?.includes('SSLv3')
-      );
+        (origin) => origin.CustomOriginConfig && origin.CustomOriginConfig.OriginSslProtocols?.Items?.includes('SSLv3')
+      )
 
       if (hasDeprecatedSSL) {
-        nonCompliantResources.push(details.ARN!);
+        nonCompliantResources.push(details.ARN!)
       } else {
-        compliantResources.push(details.ARN!);
+        compliantResources.push(details.ARN!)
       }
     }
 
-    this.stats.compliantResources = compliantResources;
-    this.stats.nonCompliantResources = nonCompliantResources;
-  };
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+  }
 
   public readonly fix: BPSetFixFn = async (...args) => {
     await this.fixImpl(...args).then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   public readonly fixImpl: BPSetFixFn = async (nonCompliantResources) => {
     for (const arn of nonCompliantResources) {
-      const distributionId = arn.split('/').pop()!;
-      const { distribution, etag } = await this.getDistributionDetails(distributionId);
+      const distributionId = arn.split('/').pop()!
+      const { distribution, etag } = await this.getDistributionDetails(distributionId)
 
       const updatedConfig = {
         ...distribution.DistributionConfig,
@@ -141,23 +137,23 @@ export class CloudFrontNoDeprecatedSSLProtocols implements BPSet {
                     ...origin.CustomOriginConfig.OriginSslProtocols,
                     Items: origin.CustomOriginConfig.OriginSslProtocols?.Items?.filter(
                       (protocol) => protocol !== 'SSLv3'
-                    ),
-                  },
-                },
-              };
+                    )
+                  }
+                }
+              }
             }
-            return origin;
-          }),
-        },
-      };
+            return origin
+          })
+        }
+      }
 
       await this.client.send(
         new UpdateDistributionCommand({
           Id: distributionId,
           IfMatch: etag,
-          DistributionConfig: updatedConfig as any,
+          DistributionConfig: updatedConfig as unknown
         })
-      );
+      )
     }
-  };
+  }
 }

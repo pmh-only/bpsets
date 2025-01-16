@@ -3,31 +3,29 @@ import {
   ListClustersCommand,
   ListServicesCommand,
   DescribeServicesCommand,
-  UpdateServiceCommand,
-} from '@aws-sdk/client-ecs';
-import { BPSet, BPSetFixFn, BPSetStats } from '../../types';
-import { Memorizer } from '../../Memorizer';
+  UpdateServiceCommand
+} from '@aws-sdk/client-ecs'
+import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
+import { Memorizer } from '../../Memorizer'
 
 export class ECSFargateLatestPlatformVersion implements BPSet {
-  private readonly client = new ECSClient({});
-  private readonly memoClient = Memorizer.memo(this.client);
+  private readonly client = new ECSClient({})
+  private readonly memoClient = Memorizer.memo(this.client)
 
   private readonly getServices = async () => {
-    const clustersResponse = await this.memoClient.send(new ListClustersCommand({}));
-    const clusterArns = clustersResponse.clusterArns || [];
-    const services: { clusterArn: string; serviceArn: string }[] = [];
+    const clustersResponse = await this.memoClient.send(new ListClustersCommand({}))
+    const clusterArns = clustersResponse.clusterArns || []
+    const services: { clusterArn: string; serviceArn: string }[] = []
 
     for (const clusterArn of clusterArns) {
-      const servicesResponse = await this.memoClient.send(
-        new ListServicesCommand({ cluster: clusterArn })
-      );
+      const servicesResponse = await this.memoClient.send(new ListServicesCommand({ cluster: clusterArn }))
       for (const serviceArn of servicesResponse.serviceArns || []) {
-        services.push({ clusterArn, serviceArn });
+        services.push({ clusterArn, serviceArn })
       }
     }
 
-    return services;
-  };
+    return services
+  }
 
   public readonly getMetadata = () => ({
     name: 'ECSFargateLatestPlatformVersion',
@@ -43,104 +41,106 @@ export class ECSFargateLatestPlatformVersion implements BPSet {
     commandUsedInCheckFunction: [
       {
         name: 'ListClustersCommand',
-        reason: 'Retrieve ECS clusters to identify associated services.',
+        reason: 'Retrieve ECS clusters to identify associated services.'
       },
       {
         name: 'ListServicesCommand',
-        reason: 'Retrieve services associated with each ECS cluster.',
+        reason: 'Retrieve services associated with each ECS cluster.'
       },
       {
         name: 'DescribeServicesCommand',
-        reason: 'Check the platform version of each ECS service.',
-      },
+        reason: 'Check the platform version of each ECS service.'
+      }
     ],
     commandUsedInFixFunction: [
       {
         name: 'UpdateServiceCommand',
-        reason: 'Update ECS services to use the latest platform version.',
-      },
+        reason: 'Update ECS services to use the latest platform version.'
+      }
     ],
     adviseBeforeFixFunction:
-      'Ensure that updating to the latest platform version aligns with your workload requirements.',
-  });
+      'Ensure that updating to the latest platform version aligns with your workload requirements.'
+  })
 
   private readonly stats: BPSetStats = {
     nonCompliantResources: [],
     compliantResources: [],
     status: 'LOADED',
-    errorMessage: [],
-  };
+    errorMessage: []
+  }
 
-  public readonly getStats = () => this.stats;
+  public readonly getStats = () => this.stats
 
   public readonly clearStats = () => {
-    this.stats.compliantResources = [];
-    this.stats.nonCompliantResources = [];
-    this.stats.status = 'LOADED';
-    this.stats.errorMessage = [];
-  };
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
 
   public readonly check = async () => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.checkImpl().then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   private readonly checkImpl = async () => {
-    const compliantResources: string[] = [];
-    const nonCompliantResources: string[] = [];
-    const services = await this.getServices();
+    const compliantResources: string[] = []
+    const nonCompliantResources: string[] = []
+    const services = await this.getServices()
 
     for (const { clusterArn, serviceArn } of services) {
       const serviceResponse = await this.memoClient.send(
         new DescribeServicesCommand({ cluster: clusterArn, services: [serviceArn] })
-      );
+      )
 
-      const service = serviceResponse.services?.[0];
+      const service = serviceResponse.services?.[0]
       if (service?.platformVersion === 'LATEST') {
-        compliantResources.push(service.serviceArn!);
+        compliantResources.push(service.serviceArn!)
       } else {
-        nonCompliantResources.push(service?.serviceArn!);
+        if (service?.serviceArn) {
+          nonCompliantResources.push(service.serviceArn)
+        }
       }
     }
 
-    this.stats.compliantResources = compliantResources;
-    this.stats.nonCompliantResources = nonCompliantResources;
-  };
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+  }
 
   public readonly fix: BPSetFixFn = async (...args) => {
     await this.fixImpl(...args).then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   public readonly fixImpl: BPSetFixFn = async (nonCompliantResources) => {
     for (const serviceArn of nonCompliantResources) {
-      const clusterArn = serviceArn.split(':cluster/')[1].split(':service/')[0];
+      const clusterArn = serviceArn.split(':cluster/')[1].split(':service/')[0]
 
       await this.client.send(
         new UpdateServiceCommand({
           cluster: clusterArn,
           service: serviceArn,
-          platformVersion: 'LATEST',
+          platformVersion: 'LATEST'
         })
-      );
+      )
     }
-  };
+  }
 }

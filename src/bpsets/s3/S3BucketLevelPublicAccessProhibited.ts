@@ -3,20 +3,20 @@ import {
   ListBucketsCommand,
   GetPublicAccessBlockCommand,
   PutPublicAccessBlockCommand
-} from '@aws-sdk/client-s3';
-import { BPSet, BPSetMetadata, BPSetStats } from '../../types';
-import { Memorizer } from '../../Memorizer';
+} from '@aws-sdk/client-s3'
+import { BPSet, BPSetMetadata, BPSetStats } from '../../types'
+import { Memorizer } from '../../Memorizer'
 
 export class S3BucketLevelPublicAccessProhibited implements BPSet {
-  private readonly client = new S3Client({});
-  private readonly memoClient = Memorizer.memo(this.client);
+  private readonly client = new S3Client({})
+  private readonly memoClient = Memorizer.memo(this.client)
 
   private readonly stats: BPSetStats = {
     compliantResources: [],
     nonCompliantResources: [],
     status: 'LOADED',
     errorMessage: []
-  };
+  }
 
   public readonly getMetadata = (): BPSetMetadata => ({
     name: 'S3BucketLevelPublicAccessProhibited',
@@ -41,88 +41,83 @@ export class S3BucketLevelPublicAccessProhibited implements BPSet {
       }
     ],
     adviseBeforeFixFunction: 'Ensure no legitimate use cases require public access before applying this fix.'
-  });
+  })
 
-  public readonly getStats = () => this.stats;
+  public readonly getStats = () => this.stats
 
   public readonly clearStats = () => {
-    this.stats.compliantResources = [];
-    this.stats.nonCompliantResources = [];
-    this.stats.status = 'LOADED';
-    this.stats.errorMessage = [];
-  };
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
 
   public readonly check = async () => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.checkImpl()
       .then(() => {
-        this.stats.status = 'FINISHED';
+        this.stats.status = 'FINISHED'
       })
       .catch((err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
           message: err.message
-        });
-      });
-  };
+        })
+      })
+  }
 
   private readonly checkImpl = async () => {
-    const compliantResources: string[] = [];
-    const nonCompliantResources: string[] = [];
-    const buckets = await this.getBuckets();
+    const compliantResources: string[] = []
+    const nonCompliantResources: string[] = []
+    const buckets = await this.getBuckets()
 
     for (const bucket of buckets) {
       try {
-        const response = await this.memoClient.send(
-          new GetPublicAccessBlockCommand({ Bucket: bucket.Name! })
-        );
-        const config = response.PublicAccessBlockConfiguration;
+        const response = await this.memoClient.send(new GetPublicAccessBlockCommand({ Bucket: bucket.Name! }))
+        const config = response.PublicAccessBlockConfiguration
         if (
           config?.BlockPublicAcls &&
           config?.IgnorePublicAcls &&
           config?.BlockPublicPolicy &&
           config?.RestrictPublicBuckets
         ) {
-          compliantResources.push(`arn:aws:s3:::${bucket.Name!}`);
+          compliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         } else {
-          nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`);
+          nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         }
       } catch {
-        nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`);
+        nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
       }
     }
 
-    this.stats.compliantResources = compliantResources;
-    this.stats.nonCompliantResources = nonCompliantResources;
-  };
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+  }
 
   public readonly fix = async (
     nonCompliantResources: string[],
     requiredParametersForFix: { name: string; value: string }[]
   ) => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.fixImpl(nonCompliantResources, requiredParametersForFix)
       .then(() => {
-        this.stats.status = 'FINISHED';
+        this.stats.status = 'FINISHED'
       })
       .catch((err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
           message: err.message
-        });
-      });
-  };
+        })
+      })
+  }
 
-  private readonly fixImpl = async (
-    nonCompliantResources: string[],
-    requiredParametersForFix: { name: string; value: string }[]
-  ) => {
+  private readonly fixImpl = async (nonCompliantResources: string[]) => {
     for (const bucketArn of nonCompliantResources) {
-      const bucketName = bucketArn.split(':::')[1]!;
+      const bucketName = bucketArn.split(':::')[1]!
       await this.client.send(
         new PutPublicAccessBlockCommand({
           Bucket: bucketName,
@@ -133,12 +128,12 @@ export class S3BucketLevelPublicAccessProhibited implements BPSet {
             RestrictPublicBuckets: true
           }
         })
-      );
+      )
     }
-  };
+  }
 
   private readonly getBuckets = async () => {
-    const response = await this.memoClient.send(new ListBucketsCommand({}));
-    return response.Buckets || [];
-  };
+    const response = await this.memoClient.send(new ListBucketsCommand({}))
+    return response.Buckets || []
+  }
 }

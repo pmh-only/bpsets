@@ -1,25 +1,20 @@
-import {
-  ApiGatewayV2Client,
-  GetApisCommand,
-  GetStagesCommand,
-  UpdateStageCommand,
-} from '@aws-sdk/client-apigatewayv2';
-import { BPSet, BPSetFixFn, BPSetStats } from '../../types';
-import { Memorizer } from '../../Memorizer';
+import { ApiGatewayV2Client, GetApisCommand, GetStagesCommand, UpdateStageCommand } from '@aws-sdk/client-apigatewayv2'
+import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
+import { Memorizer } from '../../Memorizer'
 
 export class APIGatewayExecutionLoggingEnabled implements BPSet {
-  private readonly client = new ApiGatewayV2Client({});
-  private readonly memoClient = Memorizer.memo(this.client);
+  private readonly client = new ApiGatewayV2Client({})
+  private readonly memoClient = Memorizer.memo(this.client)
 
   private readonly getHttpApis = async () => {
-    const response = await this.memoClient.send(new GetApisCommand({}));
-    return response.Items || [];
-  };
+    const response = await this.memoClient.send(new GetApisCommand({}))
+    return response.Items || []
+  }
 
   private readonly getStages = async (apiId: string) => {
-    const response = await this.memoClient.send(new GetStagesCommand({ ApiId: apiId }));
-    return response.Items || [];
-  };
+    const response = await this.memoClient.send(new GetStagesCommand({ ApiId: apiId }))
+    return response.Items || []
+  }
 
   public readonly getMetadata = () => ({
     name: 'APIGatewayExecutionLoggingEnabled',
@@ -34,103 +29,101 @@ export class APIGatewayExecutionLoggingEnabled implements BPSet {
         name: 'log-destination-arn',
         description: 'The ARN of the CloudWatch log group for storing API Gateway logs.',
         default: '',
-        example: 'arn:aws:logs:us-east-1:123456789012:log-group:/aws/apigateway/logs',
-      },
+        example: 'arn:aws:logs:us-east-1:123456789012:log-group:/aws/apigateway/logs'
+      }
     ],
     isFixFunctionUsesDestructiveCommand: false,
     commandUsedInCheckFunction: [
       {
         name: 'GetStagesCommand',
-        reason: 'Verify if execution logging is enabled for API Gateway stages.',
-      },
+        reason: 'Verify if execution logging is enabled for API Gateway stages.'
+      }
     ],
     commandUsedInFixFunction: [
       {
         name: 'UpdateStageCommand',
-        reason: 'Enable execution logging for API Gateway stages and set the destination log group.',
-      },
+        reason: 'Enable execution logging for API Gateway stages and set the destination log group.'
+      }
     ],
-    adviseBeforeFixFunction: 'Ensure the CloudWatch log group exists and has the appropriate permissions.',
-  });
+    adviseBeforeFixFunction: 'Ensure the CloudWatch log group exists and has the appropriate permissions.'
+  })
 
   private readonly stats: BPSetStats = {
     nonCompliantResources: [],
     compliantResources: [],
     status: 'LOADED',
-    errorMessage: [],
-  };
+    errorMessage: []
+  }
 
-  public readonly getStats = () => this.stats;
+  public readonly getStats = () => this.stats
 
   public readonly clearStats = () => {
-    this.stats.compliantResources = [];
-    this.stats.nonCompliantResources = [];
-    this.stats.status = 'LOADED';
-    this.stats.errorMessage = [];
-  };
+    this.stats.compliantResources = []
+    this.stats.nonCompliantResources = []
+    this.stats.status = 'LOADED'
+    this.stats.errorMessage = []
+  }
 
   public readonly check = async () => {
-    this.stats.status = 'CHECKING';
+    this.stats.status = 'CHECKING'
 
     await this.checkImpl().then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   private readonly checkImpl = async () => {
-    const compliantResources: string[] = [];
-    const nonCompliantResources: string[] = [];
-    const apis = await this.getHttpApis();
+    const compliantResources: string[] = []
+    const nonCompliantResources: string[] = []
+    const apis = await this.getHttpApis()
 
     for (const api of apis) {
-      const stages = await this.getStages(api.ApiId!);
+      const stages = await this.getStages(api.ApiId!)
       for (const stage of stages) {
-        const stageArn = `arn:aws:apigateway:${this.client.config.region}::/apis/${api.ApiId}/stages/${stage.StageName}`;
-        const loggingLevel = stage.AccessLogSettings?.Format;
+        const stageArn = `arn:aws:apigateway:${this.client.config.region}::/apis/${api.ApiId}/stages/${stage.StageName}`
+        const loggingLevel = stage.AccessLogSettings?.Format
 
         if (loggingLevel && loggingLevel !== 'OFF') {
-          compliantResources.push(stageArn);
+          compliantResources.push(stageArn)
         } else {
-          nonCompliantResources.push(stageArn);
+          nonCompliantResources.push(stageArn)
         }
       }
     }
 
-    this.stats.compliantResources = compliantResources;
-    this.stats.nonCompliantResources = nonCompliantResources;
-  };
+    this.stats.compliantResources = compliantResources
+    this.stats.nonCompliantResources = nonCompliantResources
+  }
 
   public readonly fix: BPSetFixFn = async (...args) => {
     await this.fixImpl(...args).then(
       () => (this.stats.status = 'FINISHED'),
       (err) => {
-        this.stats.status = 'ERROR';
+        this.stats.status = 'ERROR'
         this.stats.errorMessage.push({
           date: new Date(),
-          message: err.message,
-        });
+          message: err.message
+        })
       }
-    );
-  };
+    )
+  }
 
   public readonly fixImpl: BPSetFixFn = async (nonCompliantResources, requiredParametersForFix) => {
-    const logDestinationArn = requiredParametersForFix.find(
-      (param) => param.name === 'log-destination-arn'
-    )?.value;
+    const logDestinationArn = requiredParametersForFix.find((param) => param.name === 'log-destination-arn')?.value
 
     if (!logDestinationArn) {
-      throw new Error("Required parameter 'log-destination-arn' is missing.");
+      throw new Error("Required parameter 'log-destination-arn' is missing.")
     }
 
     for (const stageArn of nonCompliantResources) {
-      const [apiId, stageName] = stageArn.split('/').slice(-2);
+      const [apiId, stageName] = stageArn.split('/').slice(-2)
 
       await this.client.send(
         new UpdateStageCommand({
@@ -138,10 +131,10 @@ export class APIGatewayExecutionLoggingEnabled implements BPSet {
           StageName: stageName,
           AccessLogSettings: {
             DestinationArn: logDestinationArn,
-            Format: '$context.requestId',
-          },
+            Format: '$context.requestId'
+          }
         })
-      );
+      )
     }
-  };
+  }
 }

@@ -1,20 +1,17 @@
 import express, { Request, Response } from 'express'
 import { BPManager } from './BPManager'
-import { BPSet, BPSetMetadata, BPSetStats } from './types'
+import { BPSetMetadata, BPSetStats } from './types'
 import { Memorizer } from './Memorizer'
 import path from 'path'
 
-export class WebServer {  
+export class WebServer {
   private readonly app = express()
-  private readonly bpManager =
-    BPManager.getInstance()
+  private readonly bpManager = BPManager.getInstance()
 
-  constructor (
-    private readonly port = 2424
-  ) {
+  constructor(private readonly port = 2424) {
     this.app.set('view engine', 'ejs')
-    this.app.set('views', path.join(__dirname, '../views'));
-    
+    this.app.set('views', path.join(__dirname, '../views'))
+
     this.app.get('/', this.getMainPage.bind(this))
     this.app.get('/check', this.runCheckOnce.bind(this))
     this.app.get('/check_all', this.runCheckAll.bind(this))
@@ -23,15 +20,15 @@ export class WebServer {
     this.app.post('/fix', this.runFix.bind(this))
 
     this.app.use(this.error404)
-    
+
     this.app.listen(this.port, this.showBanner.bind(this))
   }
-  
+
   private getMainPage(req: Request, res: Response) {
     const hidePass = req.query['hidePass'] === 'true'
     const bpStatus: {
-      category: string,
-      metadatas: (BPSetMetadata&BPSetStats)[]
+      category: string
+      metadatas: (BPSetMetadata & BPSetStats)[]
     }[] = []
 
     const bpMetadatas = this.bpManager.getBPSets().map((v, idx) => ({ ...v, idx }))
@@ -40,11 +37,11 @@ export class WebServer {
     for (const category of categories)
       bpStatus.push({
         category,
-        metadatas:
-          bpMetadatas
-          .filter((v) =>
-            v.getMetadata().awsService === category &&
-            (!hidePass || v.getStats().nonCompliantResources.length > 0))
+        metadatas: bpMetadatas
+          .filter(
+            (v) =>
+              v.getMetadata().awsService === category && (!hidePass || v.getStats().nonCompliantResources.length > 0)
+          )
           .map((v) => ({ ...v.getMetadata(), ...v.getStats(), idx: v.idx }))
       })
 
@@ -93,8 +90,7 @@ export class WebServer {
     res.write('<pre>Start Checking....\n')
 
     Memorizer.reset()
-    await this.bpManager.runCheckAll((name) =>
-      res.write(`${name} - FINISHED\n`))
+    await this.bpManager.runCheckAll((name) => res.write(`${name} - FINISHED\n`))
 
     res.write(`<a href="/?hidePass=${hidePass}">Done. Return to Report Page</a>`)
     res.write(`<script>window.location.replace('/?hidePass=${hidePass}')</script>`)
@@ -109,7 +105,7 @@ export class WebServer {
     res.write('<body class="bg-gray-100 text-gray-800">')
     res.write('<div class="container mx-auto p-4">')
     res.write('<pre>Start Fixing....\n')
-    
+
     const { name, hidePass } = req.query
     if (typeof name !== 'string' || name.length < 1) {
       res.write('<a href="/">Failed. name not found. Return to Report Page')
@@ -117,27 +113,24 @@ export class WebServer {
       return
     }
 
-    const requiredParametersForFix =
-      Object
-        .keys(req.body)
-        .map((k) => ({ name: k, value: req.body[k] }))
+    const requiredParametersForFix = Object.keys(req.body).map((k) => ({ name: k, value: req.body[k] }))
 
-    await this.bpManager.runFix(name, requiredParametersForFix)
-      .catch((error) => {
-        res.write(error.toString() + '\n')
-      })
+    await this.bpManager.runFix(name, requiredParametersForFix).catch((error) => {
+      res.write(error.toString() + '\n')
+    })
 
     res.write(`<a href="/?hidePass=${hidePass}">Done. Return to Report Page`)
     res.write(`<script>window.location.replace('/?hidePass=${hidePass}')</script>`)
     res.end()
   }
 
-  private error404 (_: Request, res: Response) {
+  private error404(_: Request, res: Response) {
     res.status(404).send({ success: false, message: 'Page not found' })
   }
 
   private showBanner() {
-    console.log(`
+    console.log(
+      `
 
        _______  _______  _______  _______  _______  _______ 
       |  _    ||       ||       ||       ||       ||       |
@@ -151,9 +144,9 @@ export class WebServer {
       Server is now on http://127.0.0.1:${this.port}
 
     `
-      .split('\n')
-      .map((v) => v.replace(/      /, ''))
-      .join('\n')
+        .split('\n')
+        .map((v) => v.replace(/ {6}/, ''))
+        .join('\n')
     )
   }
 }

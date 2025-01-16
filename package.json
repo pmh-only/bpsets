@@ -47,12 +47,18 @@
     "sha.js": "^2.4.11"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.7",
     "@types/sha.js": "^2.4.4",
     "@yao-pkg/pkg": "^6.2.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.2",
+    "globals": "^15.14.0",
     "nodemon": "^3.1.9",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
   },
   "pkg": {
     "scripts": "build/**/*",

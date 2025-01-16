@@ -1,23 +1,23 @@
 /**
  * This interface defines required structure for all bpsets.
- * 
+ *
  * Modifying this interface causes VERY large blast impact.
  * SO PLEASE DO NOT MODIFY.
- * 
+ *
  * @author Minhyeok Park <pmh_only@pmh.codes>
  */
 export interface BPSet {
   getMetadata: () => BPSetMetadata
   getStats: () => BPSetStats
   clearStats: () => void
-  check:  () => Promise<void>
+  check: () => Promise<void>
   fix: BPSetFixFn
 }
 
 export type BPSetFixFn = (
   nonCompliantResources: string[],
   requiredParametersForFix: {
-    name: string,
+    name: string
     value: string
   }[]
 ) => Promise<void>
@@ -53,7 +53,7 @@ export interface BPSetStats {
   compliantResources: string[]
   status: 'LOADED' | 'CHECKING' | 'ERROR' | 'FINISHED'
   errorMessage: {
-    date: Date,
+    date: Date
     message: string
   }[]
 }
