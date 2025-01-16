@@ -80,7 +80,7 @@ export class S3BucketDefaultLockEnabled implements BPSet {
         await this.memoClient.send(new GetObjectLockConfigurationCommand({ Bucket: bucket.Name! }))
         compliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
       } catch (error) {
-        if ((error as unknown).name === 'ObjectLockConfigurationNotFoundError') {
+        if ((error as Error).name === 'ObjectLockConfigurationNotFoundError') {
           nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         } else {
           throw error
@@ -92,13 +92,10 @@ export class S3BucketDefaultLockEnabled implements BPSet {
     this.stats.nonCompliantResources = nonCompliantResources
   }
 
-  public readonly fix = async (
-    nonCompliantResources: string[],
-    requiredParametersForFix: { name: string; value: string }[]
-  ) => {
+  public readonly fix = async (nonCompliantResources: string[]) => {
     this.stats.status = 'CHECKING'
 
-    await this.fixImpl(nonCompliantResources, requiredParametersForFix)
+    await this.fixImpl(nonCompliantResources)
       .then(() => {
         this.stats.status = 'FINISHED'
       })

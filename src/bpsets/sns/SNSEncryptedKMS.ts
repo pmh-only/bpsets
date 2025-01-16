@@ -80,7 +80,7 @@ export class SNSEncryptedKMS implements BPSet {
     const topics = await this.getTopics()
 
     for (const topic of topics) {
-      if ((topic as unknown).KmsMasterKeyId) {
+      if (topic.KmsMasterKeyId) {
         compliantResources.push(topic.TopicArn!)
       } else {
         nonCompliantResources.push(topic.TopicArn!)
@@ -135,7 +135,7 @@ export class SNSEncryptedKMS implements BPSet {
     const topicsResponse = await this.memoClient.send(new ListTopicsCommand({}))
     const topics = topicsResponse.Topics || []
 
-    const topicDetails = []
+    const topicDetails: Record<string, string>[] = []
     for (const topic of topics) {
       const attributes = await this.memoClient.send(new GetTopicAttributesCommand({ TopicArn: topic.TopicArn! }))
       topicDetails.push({ ...attributes.Attributes, TopicArn: topic.TopicArn! })

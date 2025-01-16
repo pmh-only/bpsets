@@ -57,3 +57,24 @@ export interface BPSetStats {
     message: string
   }[]
 }
+interface PolicyDocument {
+  Version: '2012-10-17' | '2008-10-17' // Only valid AWS IAM policy versions
+  Statement: Statement[]
+}
+
+interface Statement {
+  Sid?: string // Optional statement ID
+  Effect: 'Allow' | 'Deny' // Effect of the statement
+  Action: string | string[] // Action(s) the statement applies to
+  Resource: string | string[] // Resource(s) the statement applies to
+  Principal?:
+    | '*'
+    | {
+        [key: string]: string | string[]
+      } // Optional principal(s) the statement applies to, can be "*"
+  Condition?: {
+    [key: string]: {
+      [operator: string]: string | string[]
+    }
+  } // Optional conditions for the statement
+}

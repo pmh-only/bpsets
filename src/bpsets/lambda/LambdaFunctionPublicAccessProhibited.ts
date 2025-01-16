@@ -1,5 +1,5 @@
 import { LambdaClient, ListFunctionsCommand, GetPolicyCommand, RemovePermissionCommand } from '@aws-sdk/client-lambda'
-import { BPSet, BPSetMetadata, BPSetStats } from '../../types'
+import { BPSet, BPSetMetadata, BPSetStats, PolicyDocument } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class LambdaFunctionPublicAccessProhibited implements BPSet {
@@ -75,10 +75,10 @@ export class LambdaFunctionPublicAccessProhibited implements BPSet {
     for (const func of functions) {
       try {
         const response = await this.memoClient.send(new GetPolicyCommand({ FunctionName: func.FunctionName! }))
-        const policy = JSON.parse(response.Policy!)
+        const policy = JSON.parse(response.Policy!) as PolicyDocument
 
         const hasPublicAccess = policy.Statement.some(
-          (statement: unknown) => statement.Principal === '*' || statement.Principal?.AWS === '*'
+          (statement) => statement.Principal === '*' || statement.Principal?.AWS === '*'
         )
 
         if (hasPublicAccess) {
@@ -87,7 +87,7 @@ export class LambdaFunctionPublicAccessProhibited implements BPSet {
           compliantResources.push(func.FunctionArn!)
         }
       } catch (error) {
-        if ((error as unknown).name === 'ResourceNotFoundException') {
+        if ((error as Error).name === 'ResourceNotFoundException') {
           compliantResources.push(func.FunctionArn!)
         } else {
           throw error
@@ -132,7 +132,7 @@ export class LambdaFunctionPublicAccessProhibited implements BPSet {
           }
         }
       } catch (error) {
-        if ((error as unknown).name !== 'ResourceNotFoundException') {
+        if ((error as Error).name !== 'ResourceNotFoundException') {
           throw error
         }
       }

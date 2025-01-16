@@ -83,13 +83,10 @@ export class RDSClusterMultiAZEnabled implements BPSet {
     this.stats.nonCompliantResources = nonCompliantResources
   }
 
-  public readonly fix = async (
-    nonCompliantResources: string[],
-    requiredParametersForFix: { name: string; value: string }[]
-  ) => {
+  public readonly fix = async () => {
     this.stats.status = 'CHECKING'
 
-    await this.fixImpl(nonCompliantResources, requiredParametersForFix)
+    await this.fixImpl()
       .then(() => {
         this.stats.status = 'FINISHED'
       })

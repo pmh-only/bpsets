@@ -76,7 +76,7 @@ export class SecurityHubEnabled implements BPSet {
       await this.memoSecurityHubClient.send(new DescribeHubCommand({}))
       compliantResources.push(awsAccountId)
     } catch (error: unknown) {
-      if (error.name === 'InvalidAccessException') {
+      if ((error as Error).name === 'InvalidAccessException') {
         nonCompliantResources.push(awsAccountId)
       } else {
         throw error

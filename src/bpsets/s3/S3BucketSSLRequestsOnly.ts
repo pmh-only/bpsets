@@ -1,5 +1,5 @@
 import { S3Client, ListBucketsCommand, GetBucketPolicyCommand, PutBucketPolicyCommand } from '@aws-sdk/client-s3'
-import { BPSet, BPSetMetadata, BPSetStats } from '../../types'
+import { BPSet, BPSetMetadata, BPSetStats, PolicyDocument, Statement } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class S3BucketSSLRequestsOnly implements BPSet {
@@ -71,10 +71,9 @@ export class S3BucketSSLRequestsOnly implements BPSet {
     for (const bucket of buckets) {
       try {
         const response = await this.memoClient.send(new GetBucketPolicyCommand({ Bucket: bucket.Name! }))
-        const policy = JSON.parse(response.Policy!)
+        const policy = JSON.parse(response.Policy!) as PolicyDocument
         const hasSSLCondition = policy.Statement.some(
-          (stmt: unknown) =>
-            stmt.Condition && stmt.Condition.Bool && stmt.Condition.Bool['aws:SecureTransport'] === 'false'
+          (stmt) => stmt.Condition && stmt.Condition.Bool && stmt.Condition.Bool['aws:SecureTransport'] === 'false'
         )
 
         if (hasSSLCondition) {
@@ -83,7 +82,7 @@ export class S3BucketSSLRequestsOnly implements BPSet {
           nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         }
       } catch (error) {
-        if ((error as unknown).name === 'NoSuchBucketPolicy') {
+        if ((error as Error).name === 'NoSuchBucketPolicy') {
           nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         } else {
           throw error
@@ -95,13 +94,10 @@ export class S3BucketSSLRequestsOnly implements BPSet {
     this.stats.nonCompliantResources = nonCompliantResources
   }
 
-  public readonly fix = async (
-    nonCompliantResources: string[],
-    requiredParametersForFix: { name: string; value: string }[]
-  ) => {
+  public readonly fix = async (nonCompliantResources: string[]) => {
     this.stats.status = 'CHECKING'
 
-    await this.fixImpl(nonCompliantResources, requiredParametersForFix)
+    await this.fixImpl(nonCompliantResources)
       .then(() => {
         this.stats.status = 'FINISHED'
       })
@@ -117,18 +113,18 @@ export class S3BucketSSLRequestsOnly implements BPSet {
   private readonly fixImpl = async (nonCompliantResources: string[]) => {
     for (const bucketArn of nonCompliantResources) {
       const bucketName = bucketArn.split(':::')[1]!
-      let existingPolicy: unknown
+      let existingPolicy
 
       try {
         const response = await this.memoClient.send(new GetBucketPolicyCommand({ Bucket: bucketName }))
-        existingPolicy = JSON.parse(response.Policy!)
+        existingPolicy = JSON.parse(response.Policy!) as PolicyDocument
       } catch (error) {
-        if ((error as unknown).name !== 'NoSuchBucketPolicy') {
+        if ((error as Error).name !== 'NoSuchBucketPolicy') {
           throw error
         }
       }
 
-      const sslPolicyStatement = {
+      const sslPolicyStatement: Statement = {
         Sid: 'DenyNonSSLRequests',
         Effect: 'Deny',
         Principal: '*',

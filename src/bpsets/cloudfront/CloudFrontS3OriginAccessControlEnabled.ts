@@ -2,7 +2,8 @@ import {
   CloudFrontClient,
   ListDistributionsCommand,
   GetDistributionCommand,
-  UpdateDistributionCommand
+  UpdateDistributionCommand,
+  DistributionConfig
 } from '@aws-sdk/client-cloudfront'
 import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
 import { Memorizer } from '../../Memorizer'
@@ -160,7 +161,7 @@ export class CloudFrontS3OriginAccessControlEnabled implements BPSet {
         new UpdateDistributionCommand({
           Id: distributionId,
           IfMatch: etag,
-          DistributionConfig: updatedConfig as unknown
+          DistributionConfig: updatedConfig as DistributionConfig
         })
       )
     }

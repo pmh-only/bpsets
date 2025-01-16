@@ -1,6 +1,9 @@
 import { Client } from '@smithy/smithy-client'
 import shajs from 'sha.js'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyClient = Client<any, any, any, any>
+
 /**
  * Memorize AWS SDK operation results.
  * This util class tend to be always re-use AWS SDK Client
@@ -15,7 +18,7 @@ import shajs from 'sha.js'
 export class Memorizer {
   private static memorized = new Map<string, Memorizer>()
 
-  public static memo(client: Client<unknown, unknown, unknown, unknown>, salt = '') {
+  public static memo(client: AnyClient, salt = '') {
     const serialized = JSON.stringify([client.constructor.name, salt])
     const hashed = shajs('sha256').update(serialized).digest('hex')
 
@@ -35,7 +38,7 @@ export class Memorizer {
 
   private memorized = new Map<string, unknown>()
 
-  private constructor(private client: Client<unknown, unknown, unknown, unknown>) {}
+  private constructor(private client: AnyClient) {}
 
   public readonly send: typeof this.client.send = async (command) => {
     const serialized = JSON.stringify([command.constructor.name, command.input])

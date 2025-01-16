@@ -101,7 +101,7 @@ export class ECRPrivateLifecyclePolicyConfigured implements BPSet {
         )
         compliantResources.push(repository.repositoryArn!)
       } catch (error: unknown) {
-        if (error.name === 'LifecyclePolicyNotFoundException') {
+        if ((error as Error).name === 'LifecyclePolicyNotFoundException') {
           nonCompliantResources.push(repository.repositoryArn!)
         } else {
           throw error

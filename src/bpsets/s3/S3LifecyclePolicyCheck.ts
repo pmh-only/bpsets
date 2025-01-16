@@ -92,7 +92,7 @@ export class S3LifecyclePolicyCheck implements BPSet {
         await this.memoClient.send(new GetBucketLifecycleConfigurationCommand({ Bucket: bucket.Name! }))
         compliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
       } catch (error) {
-        if ((error as unknown).name === 'NoSuchLifecycleConfiguration') {
+        if ((error as Error).name === 'NoSuchLifecycleConfiguration') {
           nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         } else {
           throw error

@@ -5,7 +5,7 @@ import {
   CreatePolicyVersionCommand,
   DeletePolicyVersionCommand
 } from '@aws-sdk/client-iam'
-import { BPSet, BPSetMetadata, BPSetStats } from '../../types'
+import { BPSet, BPSetMetadata, BPSetStats, PolicyDocument } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
 export class IAMPolicyNoStatementsWithFullAccess implements BPSet {
@@ -88,9 +88,11 @@ export class IAMPolicyNoStatementsWithFullAccess implements BPSet {
         })
       )
 
-      const policyDocument = JSON.parse(decodeURIComponent(policyVersionResponse.PolicyVersion!.Document as string))
+      const policyDocument = JSON.parse(
+        decodeURIComponent(policyVersionResponse.PolicyVersion!.Document as string)
+      ) as PolicyDocument
 
-      const hasFullAccess = policyDocument.Statement.some((statement: unknown) => {
+      const hasFullAccess = policyDocument.Statement.some((statement) => {
         if (statement.Effect === 'Deny') return false
         const actions = Array.isArray(statement.Action) ? statement.Action : [statement.Action]
         return actions.some((action: string) => action.endsWith(':*'))
@@ -143,9 +145,11 @@ export class IAMPolicyNoStatementsWithFullAccess implements BPSet {
         })
       )
 
-      const policyDocument = JSON.parse(decodeURIComponent(policyVersionResponse.PolicyVersion!.Document as string))
+      const policyDocument = JSON.parse(
+        decodeURIComponent(policyVersionResponse.PolicyVersion!.Document as string)
+      ) as PolicyDocument
 
-      policyDocument.Statement = policyDocument.Statement.filter((statement: unknown) => {
+      policyDocument.Statement = policyDocument.Statement.filter((statement) => {
         if (statement.Effect === 'Deny') return true
         const actions = Array.isArray(statement.Action) ? statement.Action : [statement.Action]
         return !actions.some((action: string) => action.endsWith(':*'))

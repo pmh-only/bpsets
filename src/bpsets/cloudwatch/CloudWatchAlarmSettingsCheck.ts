@@ -1,4 +1,10 @@
-import { CloudWatchClient, DescribeAlarmsCommand, PutMetricAlarmCommand } from '@aws-sdk/client-cloudwatch'
+import {
+  CloudWatchClient,
+  ComparisonOperator,
+  DescribeAlarmsCommand,
+  PutMetricAlarmCommand,
+  Statistic
+} from '@aws-sdk/client-cloudwatch'
 import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
@@ -88,7 +94,7 @@ export class CloudWatchAlarmSettingsCheck implements BPSet {
     const compliantResources: string[] = []
     const nonCompliantResources: string[] = []
     const alarms = await this.getAlarms()
-    const parameters = {
+    const parameters: Record<string, string | null> = {
       MetricName: '', // Required
       Threshold: null,
       EvaluationPeriods: null,
@@ -100,7 +106,7 @@ export class CloudWatchAlarmSettingsCheck implements BPSet {
     for (const alarm of alarms) {
       let isCompliant = true
 
-      for (const key of Object.keys(parameters).filter((k) => (parameters as unknown)[k] !== null)) {
+      for (const key of Object.keys(parameters).filter((k) => parameters[k] !== null)) {
         if (alarm[key as keyof typeof alarm] !== parameters[key as keyof typeof parameters]) {
           isCompliant = false
           break
@@ -144,8 +150,8 @@ export class CloudWatchAlarmSettingsCheck implements BPSet {
           Threshold: parseFloat(requiredSettings['threshold']),
           EvaluationPeriods: parseInt(requiredSettings['evaluation-periods'], 10),
           Period: parseInt(requiredSettings['period'], 10),
-          ComparisonOperator: requiredSettings['comparison-operator'] as unknown,
-          Statistic: requiredSettings['statistic'] as unknown
+          ComparisonOperator: requiredSettings['comparison-operator'] as ComparisonOperator,
+          Statistic: requiredSettings['statistic'] as Statistic
         })
       )
     }

@@ -1,4 +1,10 @@
-import { ApiGatewayV2Client, GetApisCommand, GetRoutesCommand, UpdateRouteCommand } from '@aws-sdk/client-apigatewayv2'
+import {
+  ApiGatewayV2Client,
+  AuthorizationType,
+  GetApisCommand,
+  GetRoutesCommand,
+  UpdateRouteCommand
+} from '@aws-sdk/client-apigatewayv2'
 import { BPSet, BPSetFixFn, BPSetStats } from '../../types'
 import { Memorizer } from '../../Memorizer'
 
@@ -135,7 +141,7 @@ export class APIGatewayV2AuthorizationTypeConfigured implements BPSet {
         new UpdateRouteCommand({
           ApiId: api.ApiId!,
           RouteId: route.RouteId!,
-          AuthorizationType: authorizationType as unknown
+          AuthorizationType: authorizationType as AuthorizationType
         })
       )
     }

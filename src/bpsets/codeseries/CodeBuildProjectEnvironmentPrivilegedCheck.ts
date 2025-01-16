@@ -125,9 +125,9 @@ export class CodeBuildProjectEnvironmentPrivilegedCheck implements BPSet {
         new UpdateProjectCommand({
           name: projectName,
           environment: {
-            ...projectToFix.environment,
+            ...projectToFix.environment!,
             privilegedMode: false
-          } as unknown
+          }
         })
       )
     }

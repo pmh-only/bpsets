@@ -96,7 +96,7 @@ export class S3DefaultEncryptionKMS implements BPSet {
           nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         }
       } catch (error) {
-        if ((error as unknown).name === 'ServerSideEncryptionConfigurationNotFoundError') {
+        if ((error as Error).name === 'ServerSideEncryptionConfigurationNotFoundError') {
           nonCompliantResources.push(`arn:aws:s3:::${bucket.Name!}`)
         } else {
           throw error

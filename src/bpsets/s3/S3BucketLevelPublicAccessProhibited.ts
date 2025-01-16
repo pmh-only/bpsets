@@ -96,13 +96,10 @@ export class S3BucketLevelPublicAccessProhibited implements BPSet {
     this.stats.nonCompliantResources = nonCompliantResources
   }
 
-  public readonly fix = async (
-    nonCompliantResources: string[],
-    requiredParametersForFix: { name: string; value: string }[]
-  ) => {
+  public readonly fix = async (nonCompliantResources: string[]) => {
     this.stats.status = 'CHECKING'
 
-    await this.fixImpl(nonCompliantResources, requiredParametersForFix)
+    await this.fixImpl(nonCompliantResources)
       .then(() => {
         this.stats.status = 'FINISHED'
       })

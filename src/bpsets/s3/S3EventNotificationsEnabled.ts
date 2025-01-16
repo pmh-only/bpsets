@@ -2,7 +2,8 @@ import {
   S3Client,
   ListBucketsCommand,
   GetBucketNotificationConfigurationCommand,
-  PutBucketNotificationConfigurationCommand
+  PutBucketNotificationConfigurationCommand,
+  Event
 } from '@aws-sdk/client-s3'
 import { BPSet, BPSetMetadata, BPSetStats } from '../../types'
 import { Memorizer } from '../../Memorizer'
@@ -141,7 +142,7 @@ export class S3EventNotificationsEnabled implements BPSet {
             LambdaFunctionConfigurations: [
               {
                 LambdaFunctionArn: lambdaArn,
-                Events: [eventType as unknown]
+                Events: [eventType] as Event[]
               }
             ]
           }
